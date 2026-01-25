@@ -1,0 +1,124 @@
+.sidebar {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    height: calc(100vh - 40px);
+    width: 280px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 24px;
+    z-index: 100;
+}
+
+.logoContainer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 48px;
+    padding: 0 12px;
+}
+
+.logoIcon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px var(--primary-glow);
+}
+
+.appName {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: #fff;
+}
+
+.nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.navItem {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    color: #888;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    font-weight: 500;
+    font-size: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.navItem:hover {
+    background: rgba(255, 255, 255, 0.03);
+    color: #eee;
+    transform: translateX(4px);
+}
+
+.navItem.active {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.icon {
+    color: #666;
+    transition: color 0.3s;
+}
+
+.navItem:hover .icon {
+    color: #ddd;
+}
+
+.navItem.active .icon {
+    color: var(--primary);
+}
+
+.activeIndicator {
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+    margin-left: auto;
+    box-shadow: 0 0 12px var(--primary);
+}
+
+.footer {
+    padding-top: 24px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.logoutBtn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    color: #888;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}

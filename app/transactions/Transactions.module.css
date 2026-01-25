@@ -1,0 +1,260 @@
+.container {
+    min-height: 100vh;
+    background: var(--background);
+}
+
+.main {
+    margin-left: 320px;
+    padding: 40px;
+    max-width: 1200px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.controls {
+    display: flex;
+    gap: 16px;
+}
+
+.search {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #fff;
+    width: 300px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.search:focus {
+    border-color: var(--primary);
+}
+
+.addBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.addBtn:hover {
+    background: #2563eb;
+    /* Darker blue */
+    transform: translateY(-1px);
+}
+
+.tableContainer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    text-align: left;
+    padding: 16px 24px;
+    color: #888;
+    font-weight: 500;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+}
+
+.table td {
+    padding: 16px 24px;
+    color: #eee;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.amount {
+    font-weight: 600;
+    font-feature-settings: "tnum";
+}
+
+.income {
+    color: var(--success);
+}
+
+.expense {
+    color: #eee;
+}
+
+.categoryTag {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.05);
+    color: #aaa;
+    display: inline-block;
+}
+
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: #111;
+    border: 1px solid var(--border);
+    width: 480px;
+    border-radius: 24px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modalTitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.closeBtn:hover {
+    color: #fff;
+}
+
+.iconBtn {
+    background: transparent;
+    border: none;
+    color: #666;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iconBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label {
+    color: #888;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.input,
+.select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+}
+
+.input:focus,
+.select:focus {
+    border-color: var(--primary);
+}
+
+.submitBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s;
+}
+
+.submitBtn:hover {
+    background: #2563eb;
+}
+
+.typeToggle {
+    display: flex;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    border-radius: 12px;
+}
+
+.toggleOption {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #888;
+    transition: all 0.2s;
+}
+
+.toggleOption.active {
+    background: var(--surface);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}

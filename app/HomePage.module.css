@@ -1,0 +1,233 @@
+.container {
+    min-height: 100vh;
+    background: var(--background);
+}
+
+.main {
+    margin-left: 320px;
+    padding: 40px;
+    max-width: 1600px;
+    animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 48px;
+}
+
+.greeting {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: linear-gradient(to right, #fff, #999);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.02em;
+}
+
+.date {
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.searchBar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 320px;
+    transition: border-color 0.2s;
+}
+
+.searchBar:focus-within {
+    border-color: var(--primary);
+}
+
+.searchInput {
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    color: white;
+    width: 100%;
+    outline: none;
+    font-family: inherit;
+}
+
+.iconBtn {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.iconBtn:hover {
+    background: var(--surface-hover);
+    transform: translateY(-2px);
+}
+
+.badge {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2px solid var(--surface);
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr;
+    gap: 32px;
+}
+
+.leftCol {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.chartSection {
+    flex: 1;
+}
+
+.rightCol {
+    display: flex;
+    flex-direction: column;
+}
+
+.recentTransactions {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px;
+    height: 100%;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.sectionHeader h3 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.viewAll {
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.viewAll:hover {
+    opacity: 0.8;
+}
+
+.transactionList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.transactionItem {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    border-radius: 16px;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+.transactionItem:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.tIcon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.tInfo {
+    flex: 1;
+}
+
+.tName {
+    font-weight: 500;
+    font-size: 15px;
+    margin-bottom: 4px;
+    color: #eee;
+}
+
+.tDate {
+    font-size: 13px;
+    color: #666;
+}
+
+.tAmount {
+    font-weight: 600;
+    font-size: 15px;
+    color: #eee;
+}

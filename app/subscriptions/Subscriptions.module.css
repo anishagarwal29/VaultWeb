@@ -1,0 +1,290 @@
+.container {
+    min-height: 100vh;
+    background: var(--background);
+}
+
+.main {
+    margin-left: 320px;
+    padding: 40px;
+    max-width: 1200px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.addBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.addBtn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    position: relative;
+    transition: transform 0.2s, background 0.2s;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    background: var(--surface-hover);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.cardContent {
+    position: relative;
+    z-index: 1;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #fff;
+}
+
+.trialBadge {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--warning);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.info {
+    margin-bottom: 24px;
+}
+
+.name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.cycle {
+    font-size: 13px;
+    color: #888;
+    text-transform: capitalize;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 20px;
+}
+
+.dateBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dateLabel {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #666;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.dateValue {
+    font-size: 14px;
+    color: #eee;
+    font-weight: 500;
+}
+
+.amount {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+}
+
+/* Modal Reuse */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: #111;
+    border: 1px solid var(--border);
+    width: 480px;
+    border-radius: 24px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modalTitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.closeBtn:hover {
+    color: #fff;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label {
+    color: #888;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.input,
+.select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+}
+
+.input:focus,
+.select:focus {
+    border-color: var(--primary);
+}
+
+.submitBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s;
+}
+
+.submitBtn:hover {
+    background: #2563eb;
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 8px 0;
+}
+
+.checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary);
+}
+
+.checkboxLabel {
+    color: #eee;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.iconBtn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #aaa;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.iconBtn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    transform: scale(1.1);
+}
