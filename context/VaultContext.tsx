@@ -278,30 +278,31 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     };
 
     const deleteTransaction = (id: string) => {
-        const transactionToDelete = transactions.find(t => t.id === id);
+        const primaryTx = transactions.find(t => t.id === id);
+        if (!primaryTx) return;
 
-        setTransactions(prev => {
-            let filtered = prev.filter(t => t.id !== id);
-            // If it's a linked transaction, delete the other side too
-            if (transactionToDelete?.linkedId) {
-                filtered = filtered.filter(t => t.linkedId !== transactionToDelete.linkedId);
-            }
-            return filtered;
-        });
+        const transactionsToDelete = primaryTx.linkedId
+            ? transactions.filter(t => t.linkedId === primaryTx.linkedId)
+            : [primaryTx];
 
-        const account = accounts.find(a => a.id === transactionToDelete?.accountId);
-        if (account) {
-            setAccounts(prev => prev.map(acc => {
-                if (acc.id === account.id) {
-                    const amount = transactionToDelete?.amount || 0;
-                    const newBalance = transactionToDelete?.type === 'income'
-                        ? acc.balance - amount
-                        : acc.balance + amount;
-                    return { ...acc, balance: newBalance };
+        // 1. Remove from state
+        setTransactions(prev => prev.filter(t =>
+            !transactionsToDelete.some(toDelete => toDelete.id === t.id)
+        ));
+
+        // 2. Revert balances for ALL involved transactions (handles BOTH sides of a transfer)
+        setAccounts(prev => prev.map(acc => {
+            let updatedBalance = acc.balance;
+            transactionsToDelete.forEach(tx => {
+                if (tx.accountId === acc.id) {
+                    // Reversing: if it was income, subtract it; if expense, add it back.
+                    updatedBalance = tx.type === 'income'
+                        ? updatedBalance - tx.amount
+                        : updatedBalance + tx.amount;
                 }
-                return acc;
-            }));
-        }
+            });
+            return { ...acc, balance: updatedBalance };
+        }));
     };
 
     const editTransaction = (updatedTransaction: Transaction) => {
@@ -326,16 +327,35 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
             });
         });
 
-        if (oldTransaction.accountId === updatedTransaction.accountId) {
-            const diff = updatedTransaction.amount - oldTransaction.amount;
-            setAccounts(prev => prev.map(acc => {
-                if (acc.id === updatedTransaction.accountId) {
-                    const change = updatedTransaction.type === 'income' ? diff : -diff;
-                    return { ...acc, balance: acc.balance + change };
+        // Handle balance adjustments
+        const amountDiff = updatedTransaction.amount - oldTransaction.amount;
+        if (amountDiff === 0) return;
+
+        setAccounts(prev => prev.map(acc => {
+            let updatedBalance = acc.balance;
+
+            // Update primary account
+            if (acc.id === updatedTransaction.accountId) {
+                updatedBalance = updatedTransaction.type === 'income'
+                    ? updatedBalance + amountDiff
+                    : updatedBalance - amountDiff;
+            }
+
+            // If it's a transfer, update the OTHER side account too
+            if (updatedTransaction.linkedId) {
+                const otherTx = transactions.find(t =>
+                    t.linkedId === updatedTransaction.linkedId && t.id !== updatedTransaction.id
+                );
+                if (otherTx && acc.id === otherTx.accountId) {
+                    // Update binary opposite: if primary was expense, other is income
+                    updatedBalance = otherTx.type === 'income'
+                        ? updatedBalance + amountDiff
+                        : updatedBalance - amountDiff;
                 }
-                return acc;
-            }));
-        }
+            }
+
+            return { ...acc, balance: updatedBalance };
+        }));
     };
 
     const addSubscription = (subscription: Subscription) => {
