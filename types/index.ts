@@ -11,6 +11,8 @@ export interface Transaction {
     currency: string;
     originalAmount?: number;
     note?: string;
+    linkedId?: string;
+    transferAccountName?: string;
 }
 
 export interface Category {

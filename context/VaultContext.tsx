@@ -278,48 +278,64 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     };
 
     const deleteTransaction = (id: string) => {
-        const transaction = transactions.find(t => t.id === id);
-        if (transaction && transaction.accountId) {
+        const transactionToDelete = transactions.find(t => t.id === id);
+
+        setTransactions(prev => {
+            let filtered = prev.filter(t => t.id !== id);
+            // If it's a linked transaction, delete the other side too
+            if (transactionToDelete?.linkedId) {
+                filtered = filtered.filter(t => t.linkedId !== transactionToDelete.linkedId);
+            }
+            return filtered;
+        });
+
+        const account = accounts.find(a => a.id === transactionToDelete?.accountId);
+        if (account) {
             setAccounts(prev => prev.map(acc => {
-                if (acc.id === transaction.accountId) {
-                    const change = transaction.type === 'income' ? -transaction.amount : transaction.amount;
+                if (acc.id === account.id) {
+                    const amount = transactionToDelete?.amount || 0;
+                    const newBalance = transactionToDelete?.type === 'income'
+                        ? acc.balance - amount
+                        : acc.balance + amount;
+                    return { ...acc, balance: newBalance };
+                }
+                return acc;
+            }));
+        }
+    };
+
+    const editTransaction = (updatedTransaction: Transaction) => {
+        const oldTransaction = transactions.find(t => t.id === updatedTransaction.id);
+        if (!oldTransaction) return;
+
+        setTransactions(prev => {
+            return prev.map(t => {
+                // Primary update
+                if (t.id === updatedTransaction.id) return updatedTransaction;
+
+                // Sync linked transaction if it exists
+                if (updatedTransaction.linkedId && t.linkedId === updatedTransaction.linkedId) {
+                    return {
+                        ...t,
+                        amount: updatedTransaction.amount,
+                        date: updatedTransaction.date,
+                        note: updatedTransaction.note,
+                    };
+                }
+                return t;
+            });
+        });
+
+        if (oldTransaction.accountId === updatedTransaction.accountId) {
+            const diff = updatedTransaction.amount - oldTransaction.amount;
+            setAccounts(prev => prev.map(acc => {
+                if (acc.id === updatedTransaction.accountId) {
+                    const change = updatedTransaction.type === 'income' ? diff : -diff;
                     return { ...acc, balance: acc.balance + change };
                 }
                 return acc;
             }));
         }
-        setTransactions(prev => prev.filter(t => t.id !== id));
-    };
-
-    const editTransaction = (updatedTransaction: Transaction) => {
-        setTransactions(prev => {
-            const oldTransaction = prev.find(t => t.id === updatedTransaction.id);
-            if (!oldTransaction) return prev;
-
-            // 1. Revert old transaction effect
-            if (oldTransaction.accountId) {
-                setAccounts(accs => accs.map(acc => {
-                    if (acc.id === oldTransaction.accountId) {
-                        const revert = oldTransaction.type === 'income' ? -oldTransaction.amount : oldTransaction.amount;
-                        return { ...acc, balance: acc.balance + revert };
-                    }
-                    return acc;
-                }));
-            }
-
-            // 2. Apply new transaction effect
-            if (updatedTransaction.accountId) {
-                setAccounts(accs => accs.map(acc => {
-                    if (acc.id === updatedTransaction.accountId) {
-                        const apply = updatedTransaction.type === 'income' ? updatedTransaction.amount : -updatedTransaction.amount;
-                        return { ...acc, balance: acc.balance + apply };
-                    }
-                    return acc;
-                }));
-            }
-
-            return prev.map(t => t.id === updatedTransaction.id ? updatedTransaction : t);
-        });
     };
 
     const addSubscription = (subscription: Subscription) => {
@@ -448,28 +464,33 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
 
         if (!fromAccount || !toAccount) return;
 
-        // Create Transactions
         const date = new Date().toISOString();
+        const linkedId = `tr_${Date.now()}`;
+
         const outgoing: Transaction = {
-            id: Date.now().toString(),
+            id: `${linkedId}_out`,
             merchant: `Transfer to ${toAccount.name}`,
             amount: amount,
             date: date,
             type: 'expense',
             category: 'Transfer',
             accountId: fromAccountId,
-            currency: fromAccount.currency
+            currency: fromAccount.currency,
+            linkedId: linkedId,
+            transferAccountName: toAccount.name
         };
 
         const incoming: Transaction = {
-            id: (Date.now() + 1).toString(),
+            id: `${linkedId}_in`,
             merchant: `Transfer from ${fromAccount.name}`,
-            amount: amount, // Note: Ideally should handle currency conversion here
+            amount: amount,
             date: date,
             type: 'income',
             category: 'Transfer',
             accountId: toAccountId,
-            currency: toAccount.currency // Assuming 1:1 for now as per previous logic
+            currency: toAccount.currency,
+            linkedId: linkedId,
+            transferAccountName: fromAccount.name
         };
 
         setTransactions(prev => [outgoing, incoming, ...prev]);

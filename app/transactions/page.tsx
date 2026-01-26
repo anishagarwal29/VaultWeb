@@ -93,23 +93,34 @@ export default function TransactionsPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredTransactions.map((t) => {
+                                    {filteredTransactions.map((t, index) => {
+                                        // Consolidation Logic: For linked transfers, only show the 'expense' side
+                                        // This prevents duplicate rows for a single transfer event.
+                                        if (t.linkedId) {
+                                            if (t.type === 'income') return null;
+                                        }
+
                                         const account = accounts.find(a => a.id === t.accountId);
                                         const symbol = getSymbol(t.currency || currency);
                                         const accountSymbol = getSymbol(account?.currency || currency);
                                         const isForeign = t.originalAmount !== undefined && t.currency !== (account?.currency || currency);
+
+                                        // Special display for transfers
+                                        const displayName = t.linkedId
+                                            ? `Transfer: ${account?.name || 'Unknown'} → ${t.transferAccountName || 'Other Account'}`
+                                            : t.merchant;
 
                                         return (
                                             <tr key={t.id}>
                                                 <td>{formatDate(t.date)}</td>
                                                 <td>
                                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                        <span style={{ fontWeight: 500 }}>{t.merchant}</span>
+                                                        <span style={{ fontWeight: 500 }}>{displayName}</span>
                                                         {t.note && <span style={{ fontSize: 12, color: '#666', marginTop: 2 }}>{t.note}</span>}
                                                     </div>
                                                 </td>
                                                 <td><span className={styles.categoryTag}>{t.category}</span></td>
-                                                <td style={{ color: '#888', fontSize: 13 }}>{account?.name || '-'}</td>
+                                                <td style={{ color: '#888', fontSize: 13 }}>{t.linkedId ? 'Transfer' : (account?.name || '-')}</td>
                                                 <td style={{ textAlign: 'right' }} className={t.type === 'income' ? styles.income : styles.expense}>
                                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                                                         <span>{t.type === 'income' ? '+' : '-'}{symbol}{Math.abs(t.originalAmount || t.amount).toFixed(2)}</span>
