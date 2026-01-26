@@ -1,16 +1,22 @@
 "use client";
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
     PieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip,
     BarChart, Bar, XAxis, YAxis, Tooltip
 } from 'recharts';
 import styles from './Analytics.module.css';
 import { useVault } from '@/context/VaultContext';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6'];
 
 export const AnalyticsContent = () => {
     const { transactions, currency, isLoading } = useVault();
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // Helper to get currency symbol
     const getSymbol = (code: string) => {
@@ -52,11 +58,11 @@ export const AnalyticsContent = () => {
         }));
     }, [transactions]);
 
-    if (isLoading) {
+    if (!isMounted || isLoading) {
         return (
             <div className={styles.grid}>
                 <div className={styles.card} style={{ pointerEvents: 'none', minHeight: 400 }}>
-                    <div style={{ padding: 20 }}>Loading...</div>
+                    <div style={{ padding: 20 }}>Loading Analytics...</div>
                 </div>
             </div>
         );
