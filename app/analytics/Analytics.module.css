@@ -11,6 +11,39 @@
     z-index: 1;
 }
 
+@media (max-width: 1024px) {
+    .main {
+        margin-left: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main {
+        margin-left: 0;
+        padding: 24px;
+        padding-bottom: 100px;
+    }
+
+    .title {
+        font-size: 28px;
+    }
+
+    .budgetSection {
+        grid-column: span 1;
+        padding: 20px;
+    }
+
+    .budgetsList {
+        grid-template-columns: 1fr;
+    }
+
+    .modal {
+        width: calc(100% - 32px);
+        margin: 16px;
+        padding: 24px;
+    }
+}
+
 .title {
     font-size: 32px;
     font-weight: 700;

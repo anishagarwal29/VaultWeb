@@ -11,6 +11,53 @@
     z-index: 1;
 }
 
+@media (max-width: 1024px) {
+    .main {
+        margin-left: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main {
+        margin-left: 0;
+        padding: 24px;
+        padding-bottom: 100px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .controls {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .search {
+        width: 100%;
+    }
+
+    .addBtn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .table th:nth-child(3),
+    .table td:nth-child(3),
+    .table th:nth-child(4),
+    .table td:nth-child(4) {
+        display: none;
+    }
+
+    .modal {
+        width: calc(100% - 32px);
+        margin: 16px;
+        padding: 24px;
+    }
+}
+
 .header {
     display: flex;
     justify-content: space-between;

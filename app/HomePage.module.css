@@ -10,6 +10,45 @@
     animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+@media (max-width: 1024px) {
+    .main {
+        margin-left: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main {
+        margin-left: 0;
+        padding: 24px;
+        padding-bottom: 100px;
+        /* Space for bottom nav */
+    }
+
+    .greeting {
+        font-size: 28px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 24px;
+    }
+
+    .actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .searchBar {
+        width: 100%;
+        flex: 1;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
