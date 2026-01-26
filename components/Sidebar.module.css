@@ -12,7 +12,10 @@
     display: flex;
     flex-direction: column;
     padding: 32px 24px;
-    z-index: 100;
+    z-index: 50;
+    /* Lower z-index to avoid dominating valid content if stacking context issues arise */
+    pointer-events: auto;
+    /* Ensure sidebar is clickable */
 }
 
 .logoContainer {
@@ -34,11 +37,16 @@
     box-shadow: 0 8px 32px var(--primary-glow);
 }
 
+.logoSvg {
+    color: white;
+    /* Always white due to gradient background */
+}
+
 .appName {
     font-size: 22px;
     font-weight: 700;
     letter-spacing: -0.03em;
-    color: #fff;
+    color: var(--foreground);
 }
 
 .nav {
@@ -54,7 +62,7 @@
     gap: 14px;
     padding: 14px 16px;
     border-radius: 14px;
-    color: #888;
+    color: var(--text-secondary);
     transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     font-weight: 500;
     font-size: 15px;
@@ -63,24 +71,24 @@
 }
 
 .navItem:hover {
-    background: rgba(255, 255, 255, 0.03);
-    color: #eee;
+    background: var(--surface-hover);
+    color: var(--foreground);
     transform: translateX(4px);
 }
 
 .navItem.active {
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--input-bg);
+    color: var(--foreground);
+    border: 1px solid var(--border);
 }
 
 .icon {
-    color: #666;
+    color: var(--text-secondary);
     transition: color 0.3s;
 }
 
 .navItem:hover .icon {
-    color: #ddd;
+    color: var(--foreground);
 }
 
 .navItem.active .icon {
@@ -108,7 +116,7 @@
     gap: 14px;
     padding: 14px 16px;
     border-radius: 14px;
-    color: #888;
+    color: var(--text-secondary);
     background: transparent;
     border: none;
     cursor: pointer;

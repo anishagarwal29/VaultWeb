@@ -6,18 +6,49 @@ import { SpendingChart } from "@/components/SpendingChart";
 import { Bell, Search, ShoppingBag, Coffee, Car, Music } from "lucide-react";
 import styles from "./HomePage.module.css";
 import { useVault } from "@/context/VaultContext";
+import { getCurrencySymbol } from "@/types";
+import { useExchangeRates } from "@/hooks/useExchangeRates";
 
 const Home = () => {
-  const { transactions, accounts } = useVault();
+  const { transactions, accounts, currency } = useVault();
+  const [currentDate, setCurrentDate] = React.useState('');
+  const currencySymbol = getCurrencySymbol(currency);
+
+  // Exchange Rates
+  const { rates, isLoading: ratesLoading } = useExchangeRates(currency);
+
+  const getNormalizedAmount = (amount: number, accountId?: string) => {
+    // If we are loading rates, just return amount (or 0?) to avoid flash of wrong numbers?
+    // Better to return amount as fallback.
+    if (!accountId) return amount;
+    const account = accounts.find(a => a.id === accountId);
+    if (!account) return amount;
+
+    if (account.currency === currency) return amount;
+    const rate = rates[account.currency];
+    return rate ? amount / rate : amount;
+  };
+
+  const getNormalizedAccountBalance = (account: { id: string, balance: number, currency: string }) => {
+    if (account.currency === currency) return account.balance;
+    const rate = rates[account.currency];
+    return rate ? account.balance / rate : account.balance;
+  }
+
+  React.useEffect(() => {
+    setCurrentDate(new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }));
+  }, []);
 
   // Calculate totals
-  const totalBalance = accounts.reduce((sum: number, acc: { balance: number }) => sum + acc.balance, 0);
+  const totalBalance = accounts.reduce((sum, acc) => sum + getNormalizedAccountBalance(acc), 0);
+
   const income = transactions
     .filter((t: { type: string }) => t.type === 'income')
-    .reduce((sum: number, t: { amount: number }) => sum + t.amount, 0);
+    .reduce((sum: number, t: any) => sum + getNormalizedAmount(t.amount, t.accountId), 0);
+
   const expense = transactions
     .filter((t: { type: string }) => t.type === 'expense')
-    .reduce((sum: number, t: { amount: number }) => sum + t.amount, 0);
+    .reduce((sum: number, t: any) => sum + getNormalizedAmount(t.amount, t.accountId), 0);
 
   const recentTransactions = transactions.slice(0, 5);
 
@@ -28,7 +59,7 @@ const Home = () => {
         <header className={styles.header}>
           <div>
             <h1 className={styles.greeting}>Good Afternoon, Anish</h1>
-            <p className={styles.date}>{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</p>
+            <p className={styles.date}>{currentDate}</p>
           </div>
           <div className={styles.actions}>
             <div className={styles.searchBar}>
@@ -47,18 +78,18 @@ const Home = () => {
           <div className={styles.leftCol}>
             <div style={{ background: 'var(--surface)', padding: 32, borderRadius: 24, border: '1px solid var(--border)', marginBottom: 24 }}>
               <div style={{ opacity: 0.7, fontSize: 14, marginBottom: 8 }}>TOTAL BALANCE</div>
-              <div style={{ fontSize: 48, fontWeight: 700, marginBottom: 24 }}>${totalBalance.toLocaleString()}</div>
+              <div style={{ fontSize: 48, fontWeight: 700, marginBottom: 24 }}>{currencySymbol}{totalBalance.toLocaleString()}</div>
               <div style={{ display: 'flex', gap: 32 }}>
                 <div>
                   <div style={{ opacity: 0.7, fontSize: 13, marginBottom: 4 }}>Income</div>
                   <div style={{ color: 'var(--success)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                    ↗ ${income.toLocaleString()}
+                    ↗ {currencySymbol}{income.toLocaleString()}
                   </div>
                 </div>
                 <div>
                   <div style={{ opacity: 0.7, fontSize: 13, marginBottom: 4 }}>Expenses</div>
                   <div style={{ color: '#ef4444', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                    ↘ ${Math.abs(expense).toLocaleString()}
+                    ↘ {currencySymbol}{Math.abs(expense).toLocaleString()}
                   </div>
                 </div>
               </div>
@@ -88,7 +119,7 @@ const Home = () => {
                         <div className={styles.tDate}>{new Date(t.date).toLocaleDateString()}</div>
                       </div>
                       <div className={styles.tAmount} style={{ color: t.type === 'income' ? 'var(--success)' : '#fff' }}>
-                        {t.type === 'income' ? '+' : '-'}${Math.abs(t.amount).toFixed(2)}
+                        {t.type === 'income' ? '+' : '-'}{currencySymbol}{Math.abs(t.amount).toFixed(2)}
                       </div>
                     </div>
                   ))

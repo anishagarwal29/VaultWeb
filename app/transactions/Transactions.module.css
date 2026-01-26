@@ -7,6 +7,8 @@
     margin-left: 320px;
     padding: 40px;
     max-width: 1200px;
+    position: relative;
+    z-index: 1;
 }
 
 .header {
@@ -19,7 +21,7 @@
 .title {
     font-size: 32px;
     font-weight: 700;
-    color: #fff;
+    color: var(--foreground);
 }
 
 .controls {
@@ -28,11 +30,11 @@
 }
 
 .search {
-    background: var(--surface);
+    background: var(--input-bg);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 12px 16px;
-    color: #fff;
+    color: var(--foreground);
     width: 300px;
     outline: none;
     font-family: inherit;
@@ -78,7 +80,7 @@
 .table th {
     text-align: left;
     padding: 16px 24px;
-    color: #888;
+    color: var(--text-secondary);
     font-weight: 500;
     font-size: 13px;
     border-bottom: 1px solid var(--border);
@@ -86,7 +88,7 @@
 
 .table td {
     padding: 16px 24px;
-    color: #eee;
+    color: var(--foreground);
     font-size: 14px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.02);
 }
@@ -105,7 +107,7 @@
 }
 
 .expense {
-    color: #eee;
+    color: var(--foreground);
 }
 
 .categoryTag {
@@ -113,8 +115,8 @@
     border-radius: 20px;
     font-size: 12px;
     font-weight: 500;
-    background: rgba(255, 255, 255, 0.05);
-    color: #aaa;
+    background: var(--input-bg);
+    color: var(--text-secondary);
     display: inline-block;
 }
 
@@ -130,14 +132,19 @@
 }
 
 .modal {
-    background: #111;
+    background: var(--surface);
     border: 1px solid var(--border);
     width: 480px;
+    max-height: 85vh;
+    /* Limit height */
+    overflow-y: auto;
+    /* Enable scrolling */
     border-radius: 24px;
     padding: 32px;
     display: flex;
     flex-direction: column;
     gap: 24px;
+    /* Maintain gap between main sections */
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
@@ -150,19 +157,19 @@
 .modalTitle {
     font-size: 20px;
     font-weight: 600;
-    color: #fff;
+    color: var(--foreground);
 }
 
 .closeBtn {
     background: transparent;
     border: none;
-    color: #666;
+    color: var(--text-secondary);
     cursor: pointer;
     padding: 4px;
 }
 
 .closeBtn:hover {
-    color: #fff;
+    color: var(--foreground);
 }
 
 .iconBtn {
@@ -192,25 +199,34 @@
 .formGroup {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .label {
-    color: #888;
+    color: var(--text-secondary);
     font-size: 13px;
     font-weight: 500;
 }
 
 .input,
 .select {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--input-bg);
     border: 1px solid var(--border);
     padding: 12px;
     border-radius: 12px;
-    color: #fff;
+    color: var(--foreground);
     font-size: 14px;
     outline: none;
     font-family: inherit;
+    -moz-appearance: textfield;
+    /* Firefox */
+}
+
+/* Hide spin buttons for number inputs */
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .input:focus,
@@ -236,7 +252,7 @@
 
 .typeToggle {
     display: flex;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--input-bg);
     padding: 4px;
     border-radius: 12px;
 }
@@ -249,12 +265,12 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
-    color: #888;
+    color: var(--text-secondary);
     transition: all 0.2s;
 }
 
 .toggleOption.active {
     background: var(--surface);
-    color: #fff;
+    color: var(--foreground);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }

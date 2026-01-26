@@ -33,7 +33,7 @@
     font-size: 36px;
     font-weight: 700;
     margin-bottom: 8px;
-    background: linear-gradient(to right, #fff, #999);
+    background: linear-gradient(to right, var(--foreground), var(--text-secondary));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -41,7 +41,7 @@
 }
 
 .date {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 14px;
     font-weight: 500;
 }
@@ -53,7 +53,7 @@
 }
 
 .searchBar {
-    background: var(--surface);
+    background: var(--input-bg);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 12px 16px;
@@ -72,7 +72,7 @@
     background: transparent;
     border: none;
     font-size: 14px;
-    color: white;
+    color: var(--foreground);
     width: 100%;
     outline: none;
     font-family: inherit;
@@ -84,7 +84,7 @@
     border-radius: 14px;
     background: var(--surface);
     border: 1px solid var(--border);
-    color: #fff;
+    color: var(--foreground);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -196,13 +196,13 @@
 }
 
 .transactionItem:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface-hover);
 }
 
 .tIcon {
     width: 48px;
     height: 48px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--input-bg);
     border-radius: 14px;
     display: flex;
     align-items: center;
@@ -218,16 +218,16 @@
     font-weight: 500;
     font-size: 15px;
     margin-bottom: 4px;
-    color: #eee;
+    color: var(--foreground);
 }
 
 .tDate {
     font-size: 13px;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .tAmount {
     font-weight: 600;
     font-size: 15px;
-    color: #eee;
+    color: var(--foreground);
 }

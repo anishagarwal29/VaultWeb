@@ -3,9 +3,23 @@ import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import styles from './SpendingChart.module.css';
 import { useVault } from '@/context/VaultContext';
+import { useExchangeRates } from '@/hooks/useExchangeRates';
+import { getCurrencySymbol } from '@/types';
 
 export function SpendingChart() {
-    const { transactions } = useVault();
+    const { transactions, currency, accounts } = useVault();
+    const currencySymbol = getCurrencySymbol(currency);
+    const { rates } = useExchangeRates(currency);
+
+    const getNormalizedAmount = (amount: number, accountId?: string) => {
+        if (!accountId) return amount;
+        const account = accounts.find(a => a.id === accountId);
+        if (!account) return amount;
+
+        if (account.currency === currency) return amount;
+        const rate = rates[account.currency];
+        return rate ? amount / rate : amount;
+    };
 
     const data = useMemo(() => {
         const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -22,11 +36,11 @@ export function SpendingChart() {
 
             const daySpend = transactions
                 .filter(t => t.type === 'expense' && t.date.startsWith(dayStr))
-                .reduce((sum, t) => sum + t.amount, 0);
+                .reduce((sum, t) => sum + getNormalizedAmount(t.amount, t.accountId), 0);
 
             return { name: dayName, uv: daySpend };
         });
-    }, [transactions]);
+    }, [transactions, rates, currency, accounts]);
 
     return (
         <div className={styles.container}>
@@ -58,7 +72,7 @@ export function SpendingChart() {
                             axisLine={false}
                             tickLine={false}
                             tick={{ fill: '#666', fontSize: 12 }}
-                            tickFormatter={(value) => `$${value}`}
+                            tickFormatter={(value) => `${currencySymbol}${value}`}
                         />
                         <Tooltip
                             contentStyle={{
@@ -69,7 +83,7 @@ export function SpendingChart() {
                                 boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
                             }}
                             itemStyle={{ color: '#aaa' }}
-                            formatter={(value: number | undefined) => [value ? `$${value}` : '$0', 'Spent']}
+                            formatter={(value: number | undefined) => [value ? `${currencySymbol}${value.toFixed(2)}` : `${currencySymbol}0.00`, 'Spent']}
                         />
                         <Area
                             type="monotone"

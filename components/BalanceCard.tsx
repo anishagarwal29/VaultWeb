@@ -5,7 +5,7 @@ import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { useVault } from '@/context/VaultContext';
 
 export function BalanceCard() {
-    const { transactions, accounts } = useVault();
+    const { transactions, accounts, currency } = useVault();
 
     // Calculate Balance from Accounts
     const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
@@ -28,9 +28,9 @@ export function BalanceCard() {
         .reduce((sum, t) => sum + t.amount, 0);
 
     const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('en-US', {
+        return new Intl.NumberFormat('en-SG', {
             style: 'currency',
-            currency: 'USD',
+            currency: currency,
         }).format(amount);
     };
 

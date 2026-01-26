@@ -7,12 +7,14 @@
     margin-left: 320px;
     padding: 40px;
     max-width: 800px;
+    position: relative;
+    z-index: 1;
 }
 
 .title {
     font-size: 32px;
     font-weight: 700;
-    color: #fff;
+    color: var(--foreground);
     margin-bottom: 32px;
 }
 
@@ -32,13 +34,13 @@
 .sectionTitle {
     font-size: 16px;
     font-weight: 600;
-    color: #fff;
+    color: var(--foreground);
     margin-bottom: 4px;
 }
 
 .sectionDesc {
     font-size: 13px;
-    color: #888;
+    color: var(--text-secondary);
 }
 
 .row {
@@ -55,7 +57,7 @@
 
 .rowLabel {
     font-size: 14px;
-    color: #eee;
+    color: var(--foreground);
     font-weight: 500;
 }
 
@@ -63,18 +65,174 @@
     padding: 8px 16px;
     border-radius: 8px;
     border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: var(--surface-hover);
+    color: var(--foreground);
     cursor: pointer;
     font-size: 13px;
 }
 
 .dangerBtn {
+    padding: 8px 16px;
+    border-radius: 8px;
     background: rgba(239, 68, 68, 0.1);
     color: var(--danger);
-    border-color: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    cursor: pointer;
+    font-size: 13px;
 }
 
 .dangerBtn:hover {
     background: rgba(239, 68, 68, 0.2);
+}
+
+/* Modal Styles */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    width: 480px;
+    border-radius: 24px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modalTitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.closeBtn:hover {
+    color: var(--foreground);
+}
+
+.categoryList {
+    padding: 12px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.categoryBadge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--foreground);
+    transition: background 0.2s;
+}
+
+.categoryBadge:hover {
+    background: var(--surface-hover-dark);
+}
+
+.deleteBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    padding: 2px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+    color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.plusBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--primary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 0;
+}
+
+.plusBtn:hover {
+    text-decoration: underline;
+}
+
+.input {
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    border-radius: 12px;
+    color: var(--foreground);
+    outline: none;
+    font-size: 14px;
+}
+
+.input:focus {
+    border-color: var(--primary);
+}
+
+.select {
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    border-radius: 12px;
+    color: var(--foreground);
+    outline: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.submitBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.submitBtn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.submitBtn:active {
+    transform: translateY(0);
 }

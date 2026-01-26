@@ -16,30 +16,6 @@
     font-weight: 700;
     color: var(--foreground);
     margin-bottom: 32px;
-    font-family: var(--font-sans);
-}
-
-/* ... */
-
-.cardTitle {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--foreground);
-    font-family: var(--font-sans);
-}
-
-.chartContainer {
-    flex: 1;
-    width: 100%;
-    min-height: 300px;
-}
-
-.budgetSection {
-    grid-column: span 2;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 32px;
 }
 
 .budgetsList {
@@ -50,46 +26,68 @@
 }
 
 .budgetCard {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 20px;
+    padding: 24px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.budgetCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .budgetTop {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
 .budgetName {
     font-weight: 600;
-    color: #eee;
+    color: var(--foreground);
+    font-size: 16px;
 }
 
 .budgetAmount {
     font-size: 14px;
-    color: #888;
+    color: var(--text-secondary);
 }
 
 .progressBarBack {
-    height: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    height: 10px;
+    background: var(--input-bg);
+    border-radius: 6px;
     overflow: hidden;
 }
 
 .progressBarFill {
     height: 100%;
-    border-radius: 4px;
+    border-radius: 6px;
     transition: width 1s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .budgetMeta {
     display: flex;
     justify-content: space-between;
-    margin-top: 8px;
-    font-size: 12px;
-    color: #666;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.addBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
 }
 
 /* Modal Styles */
@@ -105,7 +103,7 @@
 }
 
 .modal {
-    background: #111;
+    background: var(--surface);
     border: 1px solid var(--border);
     width: 480px;
     border-radius: 24px;
@@ -125,20 +123,20 @@
 .modalTitle {
     font-size: 20px;
     font-weight: 600;
-    color: #fff;
+    color: var(--foreground);
 }
 
 .closeBtn {
     background: transparent;
     border: none;
-    color: #666;
+    color: var(--text-secondary);
     cursor: pointer;
     padding: 4px;
     transition: color 0.2s;
 }
 
 .closeBtn:hover {
-    color: #fff;
+    color: var(--foreground);
 }
 
 .formGroup {
@@ -148,18 +146,18 @@
 }
 
 .label {
-    color: #888;
+    color: var(--text-secondary);
     font-size: 13px;
     font-weight: 500;
 }
 
 .input,
 .select {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--input-bg);
     border: 1px solid var(--border);
     padding: 12px;
     border-radius: 12px;
-    color: #fff;
+    color: var(--foreground);
     font-size: 14px;
     outline: none;
     font-family: inherit;
@@ -185,4 +183,22 @@
 
 .submitBtn:hover {
     background: #2563eb;
+}
+
+.dangerBtn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--foreground);
 }

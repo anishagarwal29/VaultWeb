@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { Home, Wallet, PieChart, Layers, Settings, LogOut, Command, CreditCard } from 'lucide-react';
+import { Home, Wallet, PieChart, Layers, Settings, LogOut, Command, CreditCard, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './Sidebar.module.css';
@@ -10,7 +10,8 @@ const menuItems = [
     { icon: CreditCard, label: 'Accounts', href: '/accounts' },
     { icon: Wallet, label: 'Transactions', href: '/transactions' },
     { icon: Layers, label: 'Subscriptions', href: '/subscriptions' },
-    { icon: PieChart, label: 'Analytics', href: '/analytics' },
+    { icon: BarChart3, label: 'Analytics', href: '/analytics' },
+    { icon: PieChart, label: 'Budgets', href: '/budgets' },
     { icon: Settings, label: 'Settings', href: '/settings' },
 ];
 
@@ -21,7 +22,7 @@ export function Sidebar() {
         <aside className={styles.sidebar}>
             <div className={styles.logoContainer}>
                 <div className={styles.logoIcon}>
-                    <Command size={20} color="white" />
+                    <Command size={20} className={styles.logoSvg} />
                 </div>
                 <span className={styles.appName}>Vault</span>
             </div>

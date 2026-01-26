@@ -1,6 +1,7 @@
 :root {
   --background: #050505;
   --foreground: #ededed;
+  --text-secondary: #888888;
 
   /* Primary Brand Colors */
   --primary: #3b82f6;
@@ -15,6 +16,7 @@
   --surface-hover: #121212;
   --surface-active: #1a1a1a;
   --border: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.05);
 
   /* Functional */
   --success: #10b981;
@@ -29,6 +31,19 @@
   /* Typography */
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: var(--font-mono), 'Courier New', monospace;
+}
+
+[data-theme="light"] {
+  --background: #f8fafc;
+  --foreground: #1e293b;
+  --text-secondary: #64748b;
+  --surface: #ffffff;
+  --surface-hover: #f1f5f9;
+  --surface-active: #e2e8f0;
+  --border: #e2e8f0;
+  --input-bg: #f1f5f9;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.05);
 }
 
 * {
@@ -115,4 +130,15 @@ a {
 
 .animate-fade-in {
   animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Layout Fixes - Critical for interactivity */
+main {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
+
+button {
+  cursor: pointer;
 }
