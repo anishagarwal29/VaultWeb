@@ -37,6 +37,8 @@ interface VaultContextType {
     user: any;
     login: () => void;
     logout: () => void;
+    syncStatus: 'idle' | 'saving' | 'success' | 'error';
+    isLoading: boolean;
 }
 
 const VaultContext = createContext<VaultContextType | undefined>(undefined);
@@ -53,6 +55,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
 
     // --- FIREBASE INTEGRATION ---
     const [user, setUser] = useState<any>(null);
+    const [syncStatus, setSyncStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
     // 1. Listen for Auth Changes
     useEffect(() => {
@@ -91,7 +94,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
             } else {
                 // 3. First Time Login Migration?
                 // If cloud is empty but we have local data, upload it!
-                if (localStorage.getItem('vault_transactions')) {
+                if (localStorage.getItem('vault_transactions') || localStorage.getItem('vault_accounts')) {
                     migrateLocalToCloud(userId);
                 }
             }
@@ -103,19 +106,31 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     };
 
     // 4. Sync Data to Cloud (Debounced or on Change)
+    // 4. Sync Data to Cloud (Debounced or on Change)
     useEffect(() => {
         if (user && isLoaded) {
             const saveData = async () => {
-                const docRef = doc(db, 'users', user.uid);
-                await setDoc(docRef, {
-                    transactions,
-                    accounts,
-                    subscriptions,
-                    budgets,
-                    currency,
-                    theme,
-                    lastUpdated: new Date().toISOString()
-                }, { merge: true });
+                try {
+                    setSyncStatus('saving');
+                    console.log("Saving data to Firestore...");
+                    const docRef = doc(db, 'users', user.uid);
+                    await setDoc(docRef, {
+                        transactions,
+                        accounts,
+                        subscriptions,
+                        budgets,
+                        currency,
+                        theme,
+                        lastUpdated: new Date().toISOString()
+                    }, { merge: true });
+                    console.log("Data saved successfully!");
+                    setSyncStatus('success');
+                    setTimeout(() => setSyncStatus('idle'), 2000);
+                } catch (error) {
+                    console.error("Error saving data to Firestore:", error);
+                    setSyncStatus('error');
+                    alert("Sync Error: Check your internet or Firestore Rules.");
+                }
             };
             // Save after 1s delay to avoid spamming
             const timeout = setTimeout(saveData, 1000);
@@ -505,7 +520,9 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
             deleteCategory,
             user,
             login,
-            logout
+            logout,
+            syncStatus,
+            isLoading: !isLoaded
         }}>
             {children}
         </VaultContext.Provider>
