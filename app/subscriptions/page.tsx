@@ -224,6 +224,11 @@ export default function SubscriptionsPage() {
                                                 <span>•</span>
                                                 <span style={{ textTransform: 'capitalize' }}>{sub.frequency}</span>
                                             </div>
+                                            {sub.description && (
+                                                <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
+                                                    {sub.description}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className={styles.subRight}>
                                             <div className={styles.subCost}>
