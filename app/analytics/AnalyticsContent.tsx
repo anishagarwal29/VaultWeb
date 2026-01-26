@@ -11,7 +11,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6'];
 
 export const AnalyticsContent = () => {
-    const { transactions, currency, isLoading } = useVault();
+    const { transactions = [], currency = 'SGD', isLoading } = useVault();
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -22,55 +22,69 @@ export const AnalyticsContent = () => {
     const getSymbol = (code: string) => {
         return code === 'USD' ? '$' : code === 'EUR' ? '€' : code === 'SGD' ? 'S$' : '$';
     };
-    const currencySymbol = getSymbol(currency);
+    const currencySymbol = getSymbol(currency || 'SGD');
 
     // 1. Spending by Category
     const categoryData = useMemo(() => {
-        const expenses = transactions.filter(t => t.type === 'expense');
-        const categories: Record<string, number> = {};
+        try {
+            if (!Array.isArray(transactions)) return [];
+            const expenses = transactions.filter(t => t && t.type === 'expense');
+            const categories: Record<string, number> = {};
 
-        expenses.forEach(t => {
-            const amount = Number(t.amount);
-            if (isNaN(amount)) return; // Skip invalid amounts
+            expenses.forEach(t => {
+                const amount = Number(t.amount);
+                if (isNaN(amount) || amount <= 0) return;
 
-            const cat = t.category || 'Uncategorized';
-            categories[cat] = (categories[cat] || 0) + amount;
-        });
+                const cat = t.category || 'Uncategorized';
+                categories[cat] = (categories[cat] || 0) + amount;
+            });
 
-        return Object.keys(categories).map(cat => ({
-            name: cat,
-            value: categories[cat]
-        }));
+            return Object.keys(categories).map(cat => ({
+                name: cat,
+                value: categories[cat]
+            })).filter(c => c.value > 0);
+        } catch (err) {
+            console.error("Error computing categoryData:", err);
+            return [];
+        }
     }, [transactions]);
 
     // 2. Monthly Trends
     const monthlyData = useMemo(() => {
-        const expenses = transactions.filter(t => t.type === 'expense');
-        const months: Record<string, number> = {};
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        try {
+            if (!Array.isArray(transactions)) return [];
+            const expenses = transactions.filter(t => t && t.type === 'expense');
+            const monthsMap: Map<string, { total: number, timestamp: number }> = new Map();
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-        expenses.forEach(t => {
-            const amount = Number(t.amount);
-            if (isNaN(amount)) return;
+            expenses.forEach(t => {
+                const amount = Number(t.amount);
+                if (isNaN(amount)) return;
 
-            const d = new Date(t.date);
-            if (isNaN(d.getTime())) return; // Skip invalid dates
+                const d = new Date(t.date);
+                if (isNaN(d.getTime())) return;
 
-            const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
-            months[key] = (months[key] || 0) + amount;
-        });
+                const monthIdx = d.getMonth();
+                const year = d.getFullYear();
+                const key = `${monthNames[monthIdx]} ${year}`;
+                const timestamp = new Date(year, monthIdx, 1).getTime();
 
-        // Current month and previous 5 months (sort by date order not just by key insertion)
-        // Ideally we want to sort them properly. For now keeping original logic but capped at 6.
-        // But the previous logic was Object.keys(months).slice(-6) which relies on insertion order?
-        // Let's rely on date sorting if needed, but for now just fix the crash.
-        // Actually, Object.keys ordering is complex for strings. 
-        // Let's better sort these keys if we can, but primarily fixing the crash first.
+                const existing = monthsMap.get(key) || { total: 0, timestamp };
+                monthsMap.set(key, { total: existing.total + amount, timestamp });
+            });
 
-        return Object.keys(months).slice(-6).map(m => ({
-            name: m,
-            val: months[m]
-        }));
+            // Sort by timestamp and take last 6
+            return Array.from(monthsMap.entries())
+                .sort((a, b) => a[1].timestamp - b[1].timestamp)
+                .slice(-6)
+                .map(([name, data]) => ({
+                    name,
+                    val: data.total
+                }));
+        } catch (err) {
+            console.error("Error computing monthlyData:", err);
+            return [];
+        }
     }, [transactions]);
 
     if (!isMounted || isLoading) {
@@ -82,6 +96,8 @@ export const AnalyticsContent = () => {
             </div>
         );
     }
+
+    const totalSpending = categoryData.reduce((sum, c) => sum + (c.value || 0), 0);
 
     return (
         <div className={styles.grid}>
@@ -122,7 +138,7 @@ export const AnalyticsContent = () => {
                                                 color: '#fff'
                                             }}
                                             itemStyle={{ color: '#fff', fontSize: 13 }}
-                                            formatter={(val: number | undefined) => `${currencySymbol}${(val || 0).toFixed(2)}`}
+                                            formatter={(val: any) => `${currencySymbol}${(Number(val) || 0).toFixed(2)}`}
                                         />
                                     </PieChart>
                                 </ResponsiveContainer>
@@ -134,23 +150,22 @@ export const AnalyticsContent = () => {
                                 }}>
                                     <div style={{ fontSize: 12, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 1 }}>Total</div>
                                     <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--foreground)' }}>
-                                        {currencySymbol}{categoryData.reduce((sum, c) => sum + c.value, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                        {currencySymbol}{totalSpending.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                     </div>
                                 </div>
                             </div>
 
                             <div className={styles.breakdownTable}>
-                                {categoryData.sort((a, b) => b.value - a.value).map((cat, index) => {
-                                    const total = categoryData.reduce((sum, c) => sum + c.value, 0);
-                                    const percent = ((cat.value / total) * 100).toFixed(1);
+                                {[...categoryData].sort((a, b) => b.value - a.value).map((cat, index) => {
+                                    const percent = totalSpending > 0 ? ((cat.value / totalSpending) * 100).toFixed(1) : "0.0";
                                     return (
-                                        <div key={index} className={styles.row}>
+                                        <div key={cat.name} className={styles.row}>
                                             <div className={styles.catInfo}>
                                                 <div className={styles.dot} style={{ background: COLORS[index % COLORS.length], boxShadow: `0 0 10px ${COLORS[index % COLORS.length]}44` }} />
                                                 <span className={styles.catName}>{cat.name}</span>
                                             </div>
                                             <div className={styles.catStats}>
-                                                <div className={styles.catAmount}>{currencySymbol}{cat.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                <div className={styles.catAmount}>{currencySymbol}{(cat.value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                                 <div className={styles.catPercent}>{percent}%</div>
                                             </div>
                                         </div>
@@ -196,7 +211,7 @@ export const AnalyticsContent = () => {
                                         color: '#fff'
                                     }}
                                     itemStyle={{ color: '#fff' }}
-                                    formatter={(val: number | undefined) => [`${currencySymbol}${(val || 0).toFixed(2)}`, 'Spent']}
+                                    formatter={(val: any) => [`${currencySymbol}${(Number(val) || 0).toFixed(2)}`, 'Spent']}
                                 />
                                 <Bar
                                     dataKey="val"
@@ -216,3 +231,4 @@ export const AnalyticsContent = () => {
         </div>
     );
 };
+
