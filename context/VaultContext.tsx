@@ -55,12 +55,14 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
 
     // --- FIREBASE INTEGRATION ---
     const [user, setUser] = useState<any>(null);
+    const [authLoading, setAuthLoading] = useState(true);
     const [syncStatus, setSyncStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
     // 1. Listen for Auth Changes
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
+            setAuthLoading(false);
             if (currentUser) {
                 // User logged in -> Load from Firestore
                 loadFromFirestore(currentUser.uid);
@@ -174,7 +176,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
 
     // Load from LocalStorage (Only if NOT logged in)
     useEffect(() => {
-        if (!user) {
+        if (!authLoading && !user) {
             const loadData = () => {
                 if (typeof window === 'undefined') return;
 
@@ -522,7 +524,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
             login,
             logout,
             syncStatus,
-            isLoading: !isLoaded
+            isLoading: authLoading || !isLoaded
         }}>
             {children}
         </VaultContext.Provider>

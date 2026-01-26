@@ -7,7 +7,7 @@ import { Plus, X, CreditCard, Wallet, Landmark, ArrowRightLeft, Trash2, Edit2, S
 import { Account, getCurrencySymbol } from '@/types';
 
 export default function AccountsPage() {
-    const { accounts, addAccount, deleteAccount, editAccount, currency } = useVault();
+    const { accounts, addAccount, deleteAccount, editAccount, currency, isLoading } = useVault();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingAccount, setEditingAccount] = useState<Account | null>(null);
     const [accountToDelete, setAccountToDelete] = useState<Account | null>(null);
@@ -56,40 +56,58 @@ export default function AccountsPage() {
                 </div>
 
                 <div className={styles.grid}>
-                    {accounts.map(acc => {
-                        const symbol = getSymbol(acc.currency || currency);
-                        return (
-                            <div key={acc.id} className={styles.card}>
-                                <div className={styles.cardContent} style={{ background: getGradient(acc.color) }}>
+                    {isLoading ? (
+                        // Loading Skeleton
+                        Array.from({ length: 3 }).map((_, i) => (
+                            <div key={i} className={styles.card} style={{ pointerEvents: 'none', background: 'var(--surface)', border: '1px solid var(--border)' }}>
+                                <div className={styles.cardContent} style={{ opacity: 0.3, background: 'var(--surface)' }}>
                                     <div className={styles.cardHeader}>
-                                        <div className={styles.iconBox}>
-                                            {getIcon(acc.type)}
-                                        </div>
-                                        <div className={styles.actions}>
-                                            <button onClick={() => handleEdit(acc)} className={styles.actionBtn}>
-                                                <Edit2 size={16} color="white" />
-                                            </button>
-                                            <button onClick={() => setAccountToDelete(acc)} className={styles.actionBtn}>
-                                                <Trash2 size={16} color="white" />
-                                            </button>
-                                        </div>
+                                        <div style={{ width: 40, height: 40, background: '#444', borderRadius: '50%' }} />
                                     </div>
-
-                                    <div className={styles.cardBody}>
-                                        <span className={styles.accountType}>{acc.type === 'debit' ? 'Debit Card' : acc.type === 'credit' ? 'Credit Card' : acc.type.charAt(0).toUpperCase() + acc.type.slice(1)}</span>
-                                        <h3 className={styles.accountName}>{acc.name}</h3>
-                                        <div className={styles.balance}>
-                                            {symbol}{acc.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </div>
+                                    <div className={styles.cardBody} style={{ gap: 12 }}>
+                                        <div style={{ width: 80, height: 16, background: '#444', borderRadius: 4 }} />
+                                        <div style={{ width: 140, height: 24, background: '#444', borderRadius: 4 }} />
+                                        <div style={{ width: 100, height: 32, background: '#444', borderRadius: 4 }} />
                                     </div>
-
-                                    <div className={styles.cardOverlay} />
                                 </div>
                             </div>
-                        );
-                    })}
+                        ))
+                    ) : (
+                        accounts.map(acc => {
+                            const symbol = getSymbol(acc.currency || currency);
+                            return (
+                                <div key={acc.id} className={styles.card}>
+                                    <div className={styles.cardContent} style={{ background: getGradient(acc.color) }}>
+                                        <div className={styles.cardHeader}>
+                                            <div className={styles.iconBox}>
+                                                {getIcon(acc.type)}
+                                            </div>
+                                            <div className={styles.actions}>
+                                                <button onClick={() => handleEdit(acc)} className={styles.actionBtn}>
+                                                    <Edit2 size={16} color="white" />
+                                                </button>
+                                                <button onClick={() => setAccountToDelete(acc)} className={styles.actionBtn}>
+                                                    <Trash2 size={16} color="white" />
+                                                </button>
+                                            </div>
+                                        </div>
 
-                    {accounts.length === 0 && (
+                                        <div className={styles.cardBody}>
+                                            <span className={styles.accountType}>{acc.type === 'debit' ? 'Debit Card' : acc.type === 'credit' ? 'Credit Card' : acc.type.charAt(0).toUpperCase() + acc.type.slice(1)}</span>
+                                            <h3 className={styles.accountName}>{acc.name}</h3>
+                                            <div className={styles.balance}>
+                                                {symbol}{acc.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </div>
+                                        </div>
+
+                                        <div className={styles.cardOverlay} />
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+
+                    {!isLoading && accounts.length === 0 && (
                         <div className={styles.emptyState}>
                             <div className={styles.emptyIcon}>
                                 <Wallet size={48} color="#444" />
