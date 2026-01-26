@@ -4,7 +4,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { useVault } from '@/context/VaultContext';
 import styles from './Transactions.module.css';
 import { Plus, Search, Filter, X, Edit2, Trash2 } from 'lucide-react';
-import { Transaction, Account } from '@/types';
+import { Transaction, Account, formatDate } from '@/types';
 
 export default function TransactionsPage() {
     const { transactions, addTransaction, deleteTransaction, editTransaction, transferFunds, accounts, currency, availableCurrencies, categories } = useVault();
@@ -77,7 +77,7 @@ export default function TransactionsPage() {
 
                                         return (
                                             <tr key={t.id}>
-                                                <td>{new Date(t.date).toLocaleDateString()}</td>
+                                                <td>{formatDate(t.date)}</td>
                                                 <td>
                                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                                                         <span style={{ fontWeight: 500 }}>{t.merchant}</span>

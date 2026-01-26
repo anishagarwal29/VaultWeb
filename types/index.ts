@@ -86,3 +86,11 @@ export const DEFAULT_CURRENCIES: Currency[] = [
 export const getCurrencySymbol = (code: string, currencies: Currency[] = DEFAULT_CURRENCIES) => {
     return currencies.find(c => c.code === code)?.symbol || '$';
 };
+
+export const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+};

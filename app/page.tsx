@@ -6,7 +6,7 @@ import { SpendingChart } from "@/components/SpendingChart";
 import { Bell, Search, ShoppingBag, Coffee, Car, Music } from "lucide-react";
 import styles from "./HomePage.module.css";
 import { useVault } from "@/context/VaultContext";
-import { getCurrencySymbol } from "@/types";
+import { getCurrencySymbol, formatDate } from "@/types";
 import { useExchangeRates } from "@/hooks/useExchangeRates";
 
 const Home = () => {
@@ -116,7 +116,7 @@ const Home = () => {
                       </div>
                       <div className={styles.tInfo}>
                         <div className={styles.tName}>{t.merchant}</div>
-                        <div className={styles.tDate}>{new Date(t.date).toLocaleDateString()}</div>
+                        <div className={styles.tDate}>{formatDate(t.date)}</div>
                       </div>
                       <div className={styles.tAmount} style={{ color: t.type === 'income' ? 'var(--success)' : '#fff' }}>
                         {t.type === 'income' ? '+' : '-'}{currencySymbol}{Math.abs(t.amount).toFixed(2)}
