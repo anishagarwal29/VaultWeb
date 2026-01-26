@@ -30,8 +30,11 @@ export const AnalyticsContent = () => {
         const categories: Record<string, number> = {};
 
         expenses.forEach(t => {
+            const amount = Number(t.amount);
+            if (isNaN(amount)) return; // Skip invalid amounts
+
             const cat = t.category || 'Uncategorized';
-            categories[cat] = (categories[cat] || 0) + t.amount;
+            categories[cat] = (categories[cat] || 0) + amount;
         });
 
         return Object.keys(categories).map(cat => ({
@@ -47,10 +50,22 @@ export const AnalyticsContent = () => {
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
         expenses.forEach(t => {
+            const amount = Number(t.amount);
+            if (isNaN(amount)) return;
+
             const d = new Date(t.date);
+            if (isNaN(d.getTime())) return; // Skip invalid dates
+
             const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
-            months[key] = (months[key] || 0) + t.amount;
+            months[key] = (months[key] || 0) + amount;
         });
+
+        // Current month and previous 5 months (sort by date order not just by key insertion)
+        // Ideally we want to sort them properly. For now keeping original logic but capped at 6.
+        // But the previous logic was Object.keys(months).slice(-6) which relies on insertion order?
+        // Let's rely on date sorting if needed, but for now just fix the crash.
+        // Actually, Object.keys ordering is complex for strings. 
+        // Let's better sort these keys if we can, but primarily fixing the crash first.
 
         return Object.keys(months).slice(-6).map(m => ({
             name: m,
