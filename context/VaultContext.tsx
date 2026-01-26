@@ -235,7 +235,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
 
             loadData();
         }
-    }, [user]);
+    }, [user, authLoading]);
 
     // Save to LocalStorage (Only if NOT logged in) -> Optional: keep local backup?
     // Let's keep it simple: LocalStorage for guest, Firestore for user.
