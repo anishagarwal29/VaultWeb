@@ -29,10 +29,33 @@
     font-family: var(--font-sans);
 }
 
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+    /* Ensure generic height */
+}
+
+.cardHeader {
+    margin-bottom: 24px;
+}
+
 .chartContainer {
     flex: 1;
     width: 100%;
     min-height: 300px;
+    position: relative;
+    /* For Recharts */
 }
 
 .budgetSection {

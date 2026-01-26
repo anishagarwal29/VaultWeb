@@ -239,6 +239,15 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
 
     // Save to LocalStorage (Only if NOT logged in) -> Optional: keep local backup?
     // Let's keep it simple: LocalStorage for guest, Firestore for user.
+    // Apply theme whenever it changes
+    useEffect(() => {
+        if (typeof document !== 'undefined') {
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+    }, [theme]);
+
+    // Save to LocalStorage (Only if NOT logged in) -> Optional: keep local backup?
+    // Let's keep it simple: LocalStorage for guest, Firestore for user.
     useEffect(() => {
         if (!user && isLoaded) {
             localStorage.setItem('vault_transactions', JSON.stringify(transactions));
@@ -250,9 +259,6 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
 
             const custom = availableCurrencies.filter(c => !DEFAULT_CURRENCIES.find(d => d.code === c.code));
             localStorage.setItem('vault_custom_currencies', JSON.stringify(custom));
-
-            // Apply theme
-            document.documentElement.setAttribute('data-theme', theme);
         }
     }, [user, transactions, accounts, subscriptions, budgets, currency, theme, availableCurrencies, isLoaded]);
 

@@ -13,7 +13,7 @@ import { useExchangeRates } from '@/hooks/useExchangeRates';
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 
 export default function AnalyticsPage() {
-    const { transactions, accounts, currency } = useVault();
+    const { transactions, accounts, currency, isLoading } = useVault();
     const currencySymbol = getCurrencySymbol(currency);
 
     // Exchange Rates for Normalization
@@ -81,71 +81,90 @@ export default function AnalyticsPage() {
                 </div>
 
                 <div className={styles.grid}>
-                    {/* Spending Distribution */}
-                    <div className={styles.card}>
-                        <div className={styles.cardHeader}>
-                            <h2 className={styles.cardTitle}>Spending by Category</h2>
-                        </div>
-                        <div className={styles.chartContainer}>
-                            {categoryData.length > 0 ? (
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={categoryData}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={60}
-                                            outerRadius={100}
-                                            paddingAngle={5}
-                                            dataKey="value"
-                                        >
-                                            {categoryData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(0,0,0,0.5)" />
-                                            ))}
-                                        </Pie>
-                                        <ReTooltip
-                                            contentStyle={{ backgroundColor: '#111', borderColor: '#333', borderRadius: '8px' }}
-                                            itemStyle={{ color: '#fff' }}
-                                            formatter={(val: number | undefined) => `${currencySymbol}${(val || 0).toFixed(2)}`}
-                                        />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
-                                    No spending data available
+                    {isLoading ? (
+                        <>
+                            <div className={styles.card} style={{ pointerEvents: 'none' }}>
+                                <div className={styles.cardHeader}>
+                                    <div style={{ width: 150, height: 20, background: '#333', borderRadius: 4 }} />
                                 </div>
-                            )}
-                        </div>
-                    </div>
+                                <div className={styles.chartContainer} style={{ background: '#222', borderRadius: '50%', width: 200, height: 200, margin: 'auto', opacity: 0.2 }} />
+                            </div>
+                            <div className={styles.card} style={{ pointerEvents: 'none' }}>
+                                <div className={styles.cardHeader}>
+                                    <div style={{ width: 150, height: 20, background: '#333', borderRadius: 4 }} />
+                                </div>
+                                <div className={styles.chartContainer} style={{ background: '#222', borderRadius: 12, width: '100%', height: '80%', opacity: 0.2 }} />
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            {/* Spending Distribution */}
+                            <div className={styles.card}>
+                                <div className={styles.cardHeader}>
+                                    <h2 className={styles.cardTitle}>Spending by Category</h2>
+                                </div>
+                                <div className={styles.chartContainer}>
+                                    {categoryData.length > 0 ? (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie
+                                                    data={categoryData}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    innerRadius={60}
+                                                    outerRadius={100}
+                                                    paddingAngle={5}
+                                                    dataKey="value"
+                                                >
+                                                    {categoryData.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(0,0,0,0.5)" />
+                                                    ))}
+                                                </Pie>
+                                                <ReTooltip
+                                                    contentStyle={{ backgroundColor: '#111', borderColor: '#333', borderRadius: '8px' }}
+                                                    itemStyle={{ color: '#fff' }}
+                                                    formatter={(val: number | undefined) => `${currencySymbol}${(val || 0).toFixed(2)}`}
+                                                />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    ) : (
+                                        <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
+                                            No spending data available
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
-                    {/* Monthly Trends */}
-                    <div className={styles.card}>
-                        <div className={styles.cardHeader}>
-                            <h2 className={styles.cardTitle}>Monthly Trends</h2>
-                        </div>
-                        <div className={styles.chartContainer}>
-                            {monthlyData.length > 0 ? (
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={monthlyData}>
-                                        <XAxis dataKey="name" stroke="#666" tickLine={false} axisLine={false} />
-                                        <YAxis hide />
-                                        <Tooltip
-                                            cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                            contentStyle={{ backgroundColor: '#111', borderColor: '#333', borderRadius: '8px' }}
-                                            formatter={(val: number | undefined) => [`${currencySymbol}${(val || 0).toFixed(2)}`, 'Amount']}
-                                        />
-                                        <Bar dataKey="val" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
-                                    No trend data yet
+                            {/* Monthly Trends */}
+                            <div className={styles.card}>
+                                <div className={styles.cardHeader}>
+                                    <h2 className={styles.cardTitle}>Monthly Trends</h2>
                                 </div>
-                            )}
-                        </div>
-                    </div>
+                                <div className={styles.chartContainer}>
+                                    {monthlyData.length > 0 ? (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={monthlyData}>
+                                                <XAxis dataKey="name" stroke="#666" tickLine={false} axisLine={false} />
+                                                <YAxis hide />
+                                                <Tooltip
+                                                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                                                    contentStyle={{ backgroundColor: '#111', borderColor: '#333', borderRadius: '8px' }}
+                                                    formatter={(val: number | undefined) => [`${currencySymbol}${(val || 0).toFixed(2)}`, 'Amount']}
+                                                />
+                                                <Bar dataKey="val" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    ) : (
+                                        <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
+                                            No trend data yet
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </main>
-        </div>
+        </div >
     );
 }
