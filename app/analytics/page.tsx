@@ -105,28 +105,51 @@ export default function AnalyticsPage() {
                                 </div>
                                 <div className={styles.chartContainer}>
                                     {categoryData.length > 0 ? (
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <PieChart>
-                                                <Pie
-                                                    data={categoryData}
-                                                    cx="50%"
-                                                    cy="50%"
-                                                    innerRadius={60}
-                                                    outerRadius={100}
-                                                    paddingAngle={5}
-                                                    dataKey="value"
-                                                >
-                                                    {categoryData.map((entry, index) => (
-                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(0,0,0,0.5)" />
-                                                    ))}
-                                                </Pie>
-                                                <ReTooltip
-                                                    contentStyle={{ backgroundColor: '#111', borderColor: '#333', borderRadius: '8px' }}
-                                                    itemStyle={{ color: '#fff' }}
-                                                    formatter={(val: number | undefined) => `${currencySymbol}${(val || 0).toFixed(2)}`}
-                                                />
-                                            </PieChart>
-                                        </ResponsiveContainer>
+                                        <>
+                                            <div style={{ height: 300, position: 'relative' }}>
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <PieChart>
+                                                        <Pie
+                                                            data={categoryData}
+                                                            cx="50%"
+                                                            cy="50%"
+                                                            innerRadius={60}
+                                                            outerRadius={100}
+                                                            paddingAngle={5}
+                                                            dataKey="value"
+                                                        >
+                                                            {categoryData.map((entry, index) => (
+                                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(0,0,0,0.5)" />
+                                                            ))}
+                                                        </Pie>
+                                                        <ReTooltip
+                                                            contentStyle={{ backgroundColor: '#111', borderColor: '#333', borderRadius: '8px' }}
+                                                            itemStyle={{ color: '#fff' }}
+                                                            formatter={(val: number | undefined) => `${currencySymbol}${(val || 0).toFixed(2)}`}
+                                                        />
+                                                    </PieChart>
+                                                </ResponsiveContainer>
+                                            </div>
+
+                                            <div className={styles.breakdownTable}>
+                                                {categoryData.sort((a, b) => b.value - a.value).map((cat, index) => {
+                                                    const total = categoryData.reduce((sum, c) => sum + c.value, 0);
+                                                    const percent = ((cat.value / total) * 100).toFixed(1);
+                                                    return (
+                                                        <div key={index} className={styles.row}>
+                                                            <div className={styles.catInfo}>
+                                                                <div className={styles.dot} style={{ background: COLORS[index % COLORS.length] }} />
+                                                                <span className={styles.catName}>{cat.name}</span>
+                                                            </div>
+                                                            <div className={styles.catStats}>
+                                                                <div className={styles.catAmount}>{currencySymbol}{cat.value.toFixed(2)}</div>
+                                                                <div className={styles.catPercent}>{percent}%</div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </>
                                     ) : (
                                         <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
                                             No spending data available

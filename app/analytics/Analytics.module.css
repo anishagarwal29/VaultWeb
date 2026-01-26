@@ -53,9 +53,57 @@
 .chartContainer {
     flex: 1;
     width: 100%;
-    min-height: 300px;
+    min-height: 250px;
+    max-height: 300px;
     position: relative;
     /* For Recharts */
+}
+
+.breakdownTable {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+}
+
+.catInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.catName {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.catStats {
+    text-align: right;
+}
+
+.catAmount {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.catPercent {
+    font-size: 12px;
+    color: var(--text-secondary);
 }
 
 .budgetSection {
