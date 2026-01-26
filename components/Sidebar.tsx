@@ -4,6 +4,8 @@ import { Home, Wallet, PieChart, Layers, Settings, LogOut, Command, CreditCard, 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './Sidebar.module.css';
+import { useVault } from '@/context/VaultContext';
+import { LogIn } from 'lucide-react';
 
 const menuItems = [
     { icon: Home, label: 'Dashboard', href: '/' },
@@ -17,6 +19,7 @@ const menuItems = [
 
 export function Sidebar() {
     const pathname = usePathname();
+    const { user, login, logout } = useVault();
 
     return (
         <aside className={styles.sidebar}>
@@ -48,10 +51,17 @@ export function Sidebar() {
             </nav>
 
             <div className={styles.footer}>
-                <button className={styles.logoutBtn}>
-                    <LogOut size={20} />
-                    <span>Sign Out</span>
-                </button>
+                {user ? (
+                    <button className={styles.logoutBtn} onClick={logout}>
+                        <LogOut size={20} />
+                        <span>Sign Out</span>
+                    </button>
+                ) : (
+                    <button className={styles.logoutBtn} onClick={login} style={{ color: 'var(--primary)', background: 'transparent' }}>
+                        <LogIn size={20} />
+                        <span>Sign In</span>
+                    </button>
+                )}
             </div>
         </aside>
     );

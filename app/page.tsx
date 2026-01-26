@@ -10,7 +10,7 @@ import { getCurrencySymbol, formatDate } from "@/types";
 import { useExchangeRates } from "@/hooks/useExchangeRates";
 
 const Home = () => {
-  const { transactions, accounts, currency } = useVault();
+  const { transactions, accounts, currency, user, login } = useVault();
   const [currentDate, setCurrentDate] = React.useState('');
   const currencySymbol = getCurrencySymbol(currency);
 
@@ -58,7 +58,7 @@ const Home = () => {
       <main className={styles.main}>
         <header className={styles.header}>
           <div>
-            <h1 className={styles.greeting}>Good Afternoon, Anish</h1>
+            <h1 className={styles.greeting}>Good Afternoon, {user ? (user.displayName || 'User').split(' ')[0] : 'Guest'}</h1>
             <p className={styles.date}>{currentDate}</p>
           </div>
           <div className={styles.actions}>
@@ -70,7 +70,12 @@ const Home = () => {
               <Bell size={20} />
               <div className={styles.badge} />
             </button>
-            <div className={styles.avatar}>A</div>
+            {user ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={user.photoURL} alt="User" className={styles.avatar} style={{ borderRadius: '50%' }} />
+            ) : (
+              <div className={styles.avatar} onClick={login} style={{ cursor: 'pointer' }}>?</div>
+            )}
           </div>
         </header>
 
