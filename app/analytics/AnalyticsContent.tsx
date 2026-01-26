@@ -9,18 +9,14 @@ import { useVault } from '@/context/VaultContext';
 
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6'];
 
-export default function AnalyticsContent() {
-    const { transactions, accounts, currency, isLoading } = useVault();
-    // Helper to get currency symbol safely
+export const AnalyticsContent = () => {
+    const { transactions, currency, isLoading } = useVault();
+
+    // Helper to get currency symbol
     const getSymbol = (code: string) => {
-        // Just a simple mapper, or reuse your existing helper
         return code === 'USD' ? '$' : code === 'EUR' ? '€' : code === 'SGD' ? 'S$' : '$';
     };
     const currencySymbol = getSymbol(currency);
-
-    // --- Mock Rate Logic (since hook was removed in previous steps or is implicit) ---
-    // In production, ensure this logic matches your Page.tsx
-    // For this component, we assume parent handles data or we just calculate directly.
 
     // 1. Spending by Category
     const categoryData = useMemo(() => {
@@ -29,8 +25,6 @@ export default function AnalyticsContent() {
 
         expenses.forEach(t => {
             const cat = t.category || 'Uncategorized';
-            // Simple normalization for now (assume base currency if no conversion logic here)
-            // Ideally pass getNormalizedAmount as prop or from context
             categories[cat] = (categories[cat] || 0) + t.amount;
         });
 
@@ -52,8 +46,6 @@ export default function AnalyticsContent() {
             months[key] = (months[key] || 0) + t.amount;
         });
 
-        // Sort by date (naive string match for now, better to use real dates)
-        // In real app, sort properly.
         return Object.keys(months).slice(-6).map(m => ({
             name: m,
             val: months[m]
@@ -64,16 +56,7 @@ export default function AnalyticsContent() {
         return (
             <div className={styles.grid}>
                 <div className={styles.card} style={{ pointerEvents: 'none', minHeight: 400 }}>
-                    <div className={styles.cardHeader}>
-                        <div style={{ width: 150, height: 24, background: 'var(--border)', borderRadius: 6 }} />
-                    </div>
-                    <div style={{ width: 220, height: 220, borderRadius: '50%', background: 'var(--border)', margin: 'auto', opacity: 0.2 }} />
-                </div>
-                <div className={styles.card} style={{ pointerEvents: 'none', minHeight: 400 }}>
-                    <div className={styles.cardHeader}>
-                        <div style={{ width: 150, height: 24, background: 'var(--border)', borderRadius: 6 }} />
-                    </div>
-                    <div style={{ width: '100%', height: 200, background: 'var(--border)', borderRadius: 12, opacity: 0.2, marginTop: 40 }} />
+                    <div style={{ padding: 20 }}>Loading...</div>
                 </div>
             </div>
         );
@@ -211,4 +194,4 @@ export default function AnalyticsContent() {
             </div>
         </div>
     );
-}
+};
