@@ -107,7 +107,7 @@ export const AnalyticsContent = () => {
                                                 color: '#fff'
                                             }}
                                             itemStyle={{ color: '#fff', fontSize: 13 }}
-                                            formatter={(val: number) => `${currencySymbol}${val.toFixed(2)}`}
+                                            formatter={(val: number | undefined) => `${currencySymbol}${(val || 0).toFixed(2)}`}
                                         />
                                     </PieChart>
                                 </ResponsiveContainer>
@@ -181,7 +181,7 @@ export const AnalyticsContent = () => {
                                         color: '#fff'
                                     }}
                                     itemStyle={{ color: '#fff' }}
-                                    formatter={(val: number) => [`${currencySymbol}${val.toFixed(2)}`, 'Spent']}
+                                    formatter={(val: number | undefined) => [`${currencySymbol}${(val || 0).toFixed(2)}`, 'Spent']}
                                 />
                                 <Bar
                                     dataKey="val"
