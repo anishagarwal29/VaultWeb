@@ -53,6 +53,7 @@ export interface Subscription {
     isTrial: boolean;
     trialEndDate?: string; // YYYY-MM-DD
     color: string;
+    description?: string;
 }
 
 export interface Budget {

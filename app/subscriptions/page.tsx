@@ -26,7 +26,8 @@ export default function SubscriptionsPage() {
         category: 'General',
         nextBillingDate: new Date().toISOString().split('T')[0],
         isTrial: false,
-        trialEndDate: new Date().toISOString().split('T')[0]
+        trialEndDate: new Date().toISOString().split('T')[0],
+        description: ''
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -45,7 +46,8 @@ export default function SubscriptionsPage() {
             nextBillingDate: form.isTrial ? form.trialEndDate : form.nextBillingDate, // Start billing after trial
             isTrial: form.isTrial,
             trialEndDate: form.isTrial ? form.trialEndDate : undefined,
-            color: randomColor
+            color: randomColor,
+            description: form.description
         };
 
         addSubscription(newSub);
@@ -56,7 +58,8 @@ export default function SubscriptionsPage() {
             category: 'General',
             nextBillingDate: new Date().toISOString().split('T')[0],
             isTrial: false,
-            trialEndDate: new Date().toISOString().split('T')[0]
+            trialEndDate: new Date().toISOString().split('T')[0],
+            description: ''
         });
     };
 
@@ -158,6 +161,16 @@ export default function SubscriptionsPage() {
                                     className={styles.input}
                                     value={form.isTrial ? form.trialEndDate : form.nextBillingDate}
                                     onChange={e => setForm({ ...form, [form.isTrial ? 'trialEndDate' : 'nextBillingDate']: e.target.value })}
+                                />
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                                <label className={styles.label}>Description (Optional)</label>
+                                <input
+                                    className={styles.input}
+                                    placeholder="e.g. Premium Plan"
+                                    value={form.description}
+                                    onChange={e => setForm({ ...form, description: e.target.value })}
                                 />
                             </div>
                             <button type="submit" className={styles.submitBtn}>

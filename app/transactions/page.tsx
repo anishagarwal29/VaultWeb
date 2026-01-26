@@ -280,6 +280,11 @@ function TransactionModal({
 
         const finalAmount = isForeign ? parseFloat(convertedAmount) : parseFloat(originalAmount);
 
+        if (isNaN(finalAmount) || finalAmount === 0) {
+            alert("Please enter a valid amount");
+            return;
+        }
+
         const newTransaction: Transaction = {
             id: transaction?.id || Date.now().toString(),
             merchant,
@@ -354,7 +359,7 @@ function TransactionModal({
                     <div className={styles.formGroup} style={{ display: 'flex', gap: 12 }}>
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
                             <label className={styles.label}>Amount ({txnCurrency})</label>
-                            <input required type="number" step="0.01" className={styles.input} value={originalAmount} onChange={e => setOriginalAmount(e.target.value)} placeholder="0.00" />
+                            <input required type="number" step="any" className={styles.input} value={originalAmount} onChange={e => setOriginalAmount(e.target.value)} placeholder="0.00" />
                         </div>
 
                         {isForeign && type !== 'transfer' && (
