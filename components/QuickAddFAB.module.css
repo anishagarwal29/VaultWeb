@@ -103,7 +103,7 @@
 
 .input,
 .select {
-    background: var(--input-bg);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 14px;
@@ -111,6 +111,11 @@
     outline: none;
     font-size: 15px;
     transition: border-color 0.2s;
+}
+
+.select option {
+    background: var(--surface);
+    color: var(--foreground);
 }
 
 .input:focus {
