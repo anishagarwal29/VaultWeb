@@ -1,6 +1,9 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Transaction, Account, Subscription, Budget, Currency, DEFAULT_CURRENCIES, Category, DEFAULT_CATEGORIES } from '../types';
+import { auth, db, googleProvider } from '@/config/firebase';
+import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 interface VaultContextType {
     transactions: Transaction[];
@@ -31,6 +34,9 @@ interface VaultContextType {
     categories: Category[];
     addCategory: (category: Category) => void;
     deleteCategory: (id: string) => void;
+    user: any;
+    login: () => void;
+    logout: () => void;
 }
 
 const VaultContext = createContext<VaultContextType | undefined>(undefined);
@@ -45,56 +51,165 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     const [availableCurrencies, setAvailableCurrencies] = useState<Currency[]>(DEFAULT_CURRENCIES);
     const [isLoaded, setIsLoaded] = useState(false);
 
-    // Load from LocalStorage
+    // --- FIREBASE INTEGRATION ---
+    const [user, setUser] = useState<any>(null);
+
+    // 1. Listen for Auth Changes
     useEffect(() => {
-        const loadData = () => {
-            if (typeof window === 'undefined') return;
-
-            const storedTransactions = localStorage.getItem('vault_transactions');
-            const storedAccounts = localStorage.getItem('vault_accounts');
-            const storedSubscriptions = localStorage.getItem('vault_subscriptions');
-            const storedBudgets = localStorage.getItem('vault_budgets');
-            const storedCurrency = localStorage.getItem('vault_currency');
-            const storedTheme = localStorage.getItem('vault_theme');
-            const storedCustomCurrencies = localStorage.getItem('vault_custom_currencies');
-
-            const currentGlobalCurrency = storedCurrency || 'SGD';
-
-            if (storedTransactions) {
-                const parsed = JSON.parse(storedTransactions);
-                setTransactions(parsed.map((t: any) => ({ ...t, currency: t.currency || currentGlobalCurrency })));
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+            if (currentUser) {
+                // User logged in -> Load from Firestore
+                loadFromFirestore(currentUser.uid);
+            } else {
+                // User logged out -> Clear data or Load local (optional)
+                setTransactions([]);
+                setAccounts([]);
+                setSubscriptions([]);
+                setBudgets([]);
             }
-            if (storedAccounts) {
-                const parsed = JSON.parse(storedAccounts);
-                setAccounts(parsed.map((a: any) => ({ ...a, currency: a.currency || currentGlobalCurrency })));
-            }
-            if (storedSubscriptions) {
-                const parsed = JSON.parse(storedSubscriptions);
-                setSubscriptions(parsed.map((s: any) => ({
-                    ...s,
-                    cost: s.cost ?? s.amount ?? 0,
-                    frequency: s.frequency ?? s.billingCycle ?? 'monthly',
-                    nextBillingDate: s.nextBillingDate ?? s.startDate ?? new Date().toISOString().split('T')[0],
-                    isTrial: s.isTrial ?? false,
-                    trialEndDate: s.trialEndDate || undefined
-                })));
-            }
-            if (storedBudgets) setBudgets(JSON.parse(storedBudgets));
-            if (storedCurrency) setCurrency(storedCurrency);
-            if (storedTheme) setTheme(storedTheme as 'dark' | 'light');
-            if (storedCustomCurrencies) {
-                setAvailableCurrencies([...DEFAULT_CURRENCIES, ...JSON.parse(storedCustomCurrencies)]);
-            }
-
-            setIsLoaded(true);
-        };
-
-        loadData();
+        });
+        return () => unsubscribe();
     }, []);
 
-    // Save to LocalStorage
+    // 2. Load Data from Cloud
+    const loadFromFirestore = async (userId: string) => {
+        setIsLoaded(false);
+        try {
+            const docRef = doc(db, 'users', userId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                setTransactions(data.transactions || []);
+                setAccounts(data.accounts || []);
+                setSubscriptions(data.subscriptions || []);
+                setBudgets(data.budgets || []);
+                setCurrency(data.currency || 'SGD');
+                setTheme(data.theme || 'dark');
+                // ... load other settings
+            } else {
+                // 3. First Time Login Migration?
+                // If cloud is empty but we have local data, upload it!
+                if (localStorage.getItem('vault_transactions')) {
+                    migrateLocalToCloud(userId);
+                }
+            }
+        } catch (error) {
+            console.error("Error loading vault:", error);
+        } finally {
+            setIsLoaded(true);
+        }
+    };
+
+    // 4. Sync Data to Cloud (Debounced or on Change)
     useEffect(() => {
-        if (isLoaded) {
+        if (user && isLoaded) {
+            const saveData = async () => {
+                const docRef = doc(db, 'users', user.uid);
+                await setDoc(docRef, {
+                    transactions,
+                    accounts,
+                    subscriptions,
+                    budgets,
+                    currency,
+                    theme,
+                    lastUpdated: new Date().toISOString()
+                }, { merge: true });
+            };
+            // Save after 1s delay to avoid spamming
+            const timeout = setTimeout(saveData, 1000);
+            return () => clearTimeout(timeout);
+        }
+    }, [user, transactions, accounts, subscriptions, budgets, currency, theme, isLoaded]);
+
+
+    const migrateLocalToCloud = async (userId: string) => {
+        // (Simplified logic: taking current state since we hydrated from local initially)
+        // In a real app, you might want to read localStorage directly here.
+        // For now, let's assume the state has the local data.
+
+        // Actually, cleaner approach:
+        // By default, the app loaded LocalStorage on mount (see below). 
+        // So `transactions`, `accounts` etc are ALREADY populated with local data.
+        // We just need to trigger a save.
+
+        // This is handled automatically by the "Sync Data to Cloud" effect 
+        // because `user` becomes true and `isLoaded` becomes true.
+    };
+
+    // 5. Auth Actions
+    const login = async () => {
+        try {
+            await signInWithPopup(auth, googleProvider);
+        } catch (error) {
+            console.error("Login failed", error);
+        }
+    };
+
+    const logout = async () => {
+        try {
+            await signOut(auth);
+            setUser(null);
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
+    };
+
+
+    // Load from LocalStorage (Only if NOT logged in)
+    useEffect(() => {
+        if (!user) {
+            const loadData = () => {
+                if (typeof window === 'undefined') return;
+
+                const storedTransactions = localStorage.getItem('vault_transactions');
+                const storedAccounts = localStorage.getItem('vault_accounts');
+                const storedSubscriptions = localStorage.getItem('vault_subscriptions');
+                const storedBudgets = localStorage.getItem('vault_budgets');
+                const storedCurrency = localStorage.getItem('vault_currency');
+                const storedTheme = localStorage.getItem('vault_theme');
+                const storedCustomCurrencies = localStorage.getItem('vault_custom_currencies');
+
+                const currentGlobalCurrency = storedCurrency || 'SGD';
+
+                if (storedTransactions) {
+                    const parsed = JSON.parse(storedTransactions);
+                    setTransactions(parsed.map((t: any) => ({ ...t, currency: t.currency || currentGlobalCurrency })));
+                }
+                if (storedAccounts) {
+                    const parsed = JSON.parse(storedAccounts);
+                    setAccounts(parsed.map((a: any) => ({ ...a, currency: a.currency || currentGlobalCurrency })));
+                }
+                if (storedSubscriptions) {
+                    const parsed = JSON.parse(storedSubscriptions);
+                    setSubscriptions(parsed.map((s: any) => ({
+                        ...s,
+                        cost: s.cost ?? s.amount ?? 0,
+                        frequency: s.frequency ?? s.billingCycle ?? 'monthly',
+                        nextBillingDate: s.nextBillingDate ?? s.startDate ?? new Date().toISOString().split('T')[0],
+                        isTrial: s.isTrial ?? false,
+                        trialEndDate: s.trialEndDate || undefined
+                    })));
+                }
+                if (storedBudgets) setBudgets(JSON.parse(storedBudgets));
+                if (storedCurrency) setCurrency(storedCurrency);
+                if (storedTheme) setTheme(storedTheme as 'dark' | 'light');
+                if (storedCustomCurrencies) {
+                    setAvailableCurrencies([...DEFAULT_CURRENCIES, ...JSON.parse(storedCustomCurrencies)]);
+                }
+
+                setIsLoaded(true);
+            };
+
+            loadData();
+        }
+    }, [user]);
+
+    // Save to LocalStorage (Only if NOT logged in) -> Optional: keep local backup?
+    // Let's keep it simple: LocalStorage for guest, Firestore for user.
+    useEffect(() => {
+        if (!user && isLoaded) {
             localStorage.setItem('vault_transactions', JSON.stringify(transactions));
             localStorage.setItem('vault_accounts', JSON.stringify(accounts));
             localStorage.setItem('vault_subscriptions', JSON.stringify(subscriptions));
@@ -108,7 +223,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
             // Apply theme
             document.documentElement.setAttribute('data-theme', theme);
         }
-    }, [transactions, accounts, subscriptions, budgets, currency, theme, availableCurrencies, isLoaded]);
+    }, [user, transactions, accounts, subscriptions, budgets, currency, theme, availableCurrencies, isLoaded]);
 
     const addTransaction = (transaction: Transaction) => {
         setTransactions(prev => [transaction, ...prev]);
@@ -387,7 +502,10 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
             addCurrency,
             categories,
             addCategory,
-            deleteCategory
+            deleteCategory,
+            user,
+            login,
+            logout
         }}>
             {children}
         </VaultContext.Provider>
