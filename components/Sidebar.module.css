@@ -16,64 +16,6 @@
     pointer-events: auto;
 }
 
-@media (max-width: 1024px) {
-    .sidebar {
-        width: 240px;
-    }
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        left: 0;
-        top: auto;
-        bottom: 0;
-        height: auto;
-        width: 100%;
-        flex-direction: row;
-        padding: 12px 20px;
-        border-radius: 24px 24px 0 0;
-        background: rgba(10, 10, 10, 0.95);
-        backdrop-filter: blur(20px);
-        border-left: none;
-        border-right: none;
-        border-bottom: none;
-        justify-content: space-around;
-        align-items: center;
-        gap: 0;
-    }
-
-    .logoContainer,
-    .footer,
-    .activeIndicator {
-        display: none;
-    }
-
-    .nav {
-        flex: 1;
-        flex-direction: row;
-        justify-content: space-around;
-        gap: 0;
-    }
-
-    .navItem {
-        flex-direction: column;
-        gap: 4px;
-        padding: 8px;
-        font-size: 10px;
-        text-align: center;
-        width: auto;
-        flex: 1;
-    }
-
-    .navItem:hover {
-        transform: translateY(-2px);
-    }
-
-    .icon {
-        width: 20px;
-        height: 20px;
-    }
-}
 
 .logoContainer {
     display: flex;
@@ -186,4 +128,63 @@
 .logoutBtn:hover {
     background: rgba(239, 68, 68, 0.1);
     color: var(--danger);
+}
+
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 240px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        left: 0 !important;
+        top: auto !important;
+        bottom: 0 !important;
+        height: auto !important;
+        width: 100% !important;
+        flex-direction: row !important;
+        padding: 12px 20px !important;
+        border-radius: 24px 24px 0 0 !important;
+        background: rgba(10, 10, 10, 0.98) !important;
+        backdrop-filter: blur(20px) !important;
+        border: none !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        gap: 0 !important;
+    }
+
+    .logoContainer,
+    .footer,
+    .activeIndicator {
+        display: none !important;
+    }
+
+    .nav {
+        flex: 1 !important;
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        gap: 0 !important;
+    }
+
+    .navItem {
+        flex-direction: column !important;
+        gap: 4px !important;
+        padding: 8px !important;
+        font-size: 10px !important;
+        text-align: center !important;
+        width: auto !important;
+        flex: 1 !important;
+        transform: none !important;
+    }
+
+    .navItem:hover {
+        transform: translateY(-2px) !important;
+        background: transparent !important;
+    }
+
+    .icon {
+        width: 20px !important;
+        height: 20px !important;
+    }
 }

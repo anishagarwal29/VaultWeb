@@ -11,33 +11,6 @@
     z-index: 1;
 }
 
-@media (max-width: 1024px) {
-    .main {
-        margin-left: 280px;
-    }
-}
-
-@media (max-width: 768px) {
-    .main {
-        margin-left: 0;
-        padding: 24px;
-        padding-bottom: 100px;
-    }
-
-    .title {
-        font-size: 28px;
-    }
-
-    .budgetsList {
-        grid-template-columns: 1fr;
-    }
-
-    .modal {
-        width: calc(100% - 32px);
-        margin: 16px;
-        padding: 24px;
-    }
-}
 
 .title {
     font-size: 32px;
@@ -224,9 +197,33 @@
 }
 
 .btn {
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
     color: var(--foreground);
+}
+
+@media (max-width: 1024px) {
+    .main {
+        margin-left: 280px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .main {
+        margin-left: 0 !important;
+        padding: 24px !important;
+        padding-bottom: 100px !important;
+    }
+
+    .title {
+        font-size: 28px !important;
+    }
+
+    .budgetsList {
+        grid-template-columns: 1fr !important;
+    }
+
+    .modal {
+        width: calc(100% - 32px) !important;
+        margin: 16px !important;
+        padding: 24px !important;
+    }
 }
