@@ -107,7 +107,21 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    // 4. Sync Data to Cloud (Debounced or on Change)
+    // Helper to remove undefined values (Firestore rejects them)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const deepSanitize = (obj: any): any => {
+        if (obj === undefined) return null;
+        if (obj === null || typeof obj !== 'object') return obj;
+        if (Array.isArray(obj)) return obj.map(deepSanitize);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const newObj: any = {};
+        for (const key in obj) {
+            const val = deepSanitize(obj[key]);
+            if (val !== undefined) newObj[key] = val;
+        }
+        return newObj;
+    };
+
     // 4. Sync Data to Cloud (Debounced or on Change)
     useEffect(() => {
         if (user && isLoaded) {
@@ -117,10 +131,10 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
                     console.log("Saving data to Firestore...");
                     const docRef = doc(db, 'users', user.uid);
                     await setDoc(docRef, {
-                        transactions,
-                        accounts,
-                        subscriptions,
-                        budgets,
+                        transactions: deepSanitize(transactions),
+                        accounts: deepSanitize(accounts),
+                        subscriptions: deepSanitize(subscriptions),
+                        budgets: deepSanitize(budgets),
                         currency,
                         theme,
                         lastUpdated: new Date().toISOString()

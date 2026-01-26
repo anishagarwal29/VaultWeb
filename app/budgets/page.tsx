@@ -8,7 +8,7 @@ import { Budget, Account, getCurrencySymbol } from '@/types';
 import { useExchangeRates } from '@/hooks/useExchangeRates';
 
 export default function BudgetsPage() {
-    const { transactions, budgets, accounts, addBudget, deleteBudget, editBudget, currency } = useVault();
+    const { transactions, budgets, accounts, addBudget, deleteBudget, editBudget, currency, isLoading } = useVault();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
     const [budgetToDelete, setBudgetToDelete] = useState<Budget | null>(null);
@@ -77,7 +77,24 @@ export default function BudgetsPage() {
                     </button>
                 </div>
 
-                {budgetProgress.length === 0 ? (
+                {isLoading ? (
+                    <div className={styles.budgetsList}>
+                        {Array.from({ length: 3 }).map((_, i) => (
+                            <div key={i} className={styles.budgetCard} style={{ pointerEvents: 'none' }}>
+                                <div className={styles.budgetTop}>
+                                    <div>
+                                        <div style={{ width: 100, height: 16, background: '#333', borderRadius: 4, marginBottom: 8 }} />
+                                        <div style={{ width: 80, height: 12, background: '#333', borderRadius: 4 }} />
+                                    </div>
+                                </div>
+                                <div className={styles.budgetAmount} style={{ marginBottom: 12 }}>
+                                    <div style={{ width: 200, height: 14, background: '#333', borderRadius: 4 }} />
+                                </div>
+                                <div className={styles.progressBarBack} style={{ background: '#333' }} />
+                            </div>
+                        ))}
+                    </div>
+                ) : budgetProgress.length === 0 ? (
                     <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)', background: 'var(--surface)', borderRadius: 24, border: '1px solid var(--border)' }}>
                         <div style={{ marginBottom: 16 }}>No budgets created yet.</div>
                         <button className={styles.addBtn} style={{ margin: '0 auto' }} onClick={() => { setEditingBudget(null); setIsModalOpen(true); }}>

@@ -15,7 +15,8 @@ export default function SubscriptionsPage() {
         getUpcomingSubscriptions,
         getExpiringTrials,
         currency,
-        availableCurrencies
+        availableCurrencies,
+        isLoading
     } = useVault();
 
     const [form, setForm] = useState({
@@ -174,7 +175,21 @@ export default function SubscriptionsPage() {
                     </h2>
 
                     <div className={styles.subGrid}>
-                        {subscriptions.length === 0 ? (
+                        {isLoading ? (
+                            Array.from({ length: 3 }).map((_, i) => (
+                                <div key={i} className={styles.subCard} style={{ pointerEvents: 'none' }}>
+                                    <div className={styles.subIcon} style={{ backgroundColor: '#333' }} />
+                                    <div className={styles.subInfo}>
+                                        <div style={{ width: 100, height: 16, background: '#333', borderRadius: 4, marginBottom: 8 }} />
+                                        <div style={{ width: 140, height: 14, background: '#333', borderRadius: 4 }} />
+                                    </div>
+                                    <div className={styles.subRight}>
+                                        <div style={{ width: 60, height: 20, background: '#333', borderRadius: 4, marginBottom: 8 }} />
+                                        <div style={{ width: 40, height: 14, background: '#333', borderRadius: 4 }} />
+                                    </div>
+                                </div>
+                            ))
+                        ) : subscriptions.length === 0 ? (
                             <div style={{ color: 'var(--text-secondary)', gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', background: 'var(--surface)', borderRadius: 24, border: '1px dashed var(--border)' }}>
                                 No active subscriptions found. Add one above to get started.
                             </div>

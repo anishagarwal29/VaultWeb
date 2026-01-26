@@ -7,7 +7,7 @@ import { Plus, Search, Filter, X, Edit2, Trash2 } from 'lucide-react';
 import { Transaction, Account, formatDate } from '@/types';
 
 export default function TransactionsPage() {
-    const { transactions, addTransaction, deleteTransaction, editTransaction, transferFunds, accounts, currency, availableCurrencies, categories } = useVault();
+    const { transactions, addTransaction, deleteTransaction, editTransaction, transferFunds, accounts, currency, availableCurrencies, categories, isLoading } = useVault();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
@@ -56,7 +56,31 @@ export default function TransactionsPage() {
 
                 <div className={styles.tableContainer}>
                     <div className={styles.tableContainer}>
-                        {filteredTransactions.length > 0 ? (
+                        {isLoading ? (
+                            <table className={styles.table}>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Merchant</th>
+                                        <th>Category</th>
+                                        <th>Account</th>
+                                        <th style={{ textAlign: 'right' }}>Amount</th>
+                                        <th style={{ width: 80 }}></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                        <tr key={i} style={{ pointerEvents: 'none' }}>
+                                            <td><div style={{ width: 80, height: 16, background: '#444', borderRadius: 4, opacity: 0.3 }} /></td>
+                                            <td><div style={{ width: 120, height: 20, background: '#444', borderRadius: 4, opacity: 0.3 }} /></td>
+                                            <td><div style={{ width: 80, height: 24, background: '#444', borderRadius: 12, opacity: 0.3 }} /></td>
+                                            <td><div style={{ width: 100, height: 16, background: '#444', borderRadius: 4, opacity: 0.3 }} /></td>
+                                            <td style={{ textAlign: 'right' }}><div style={{ width: 80, height: 20, background: '#444', borderRadius: 4, opacity: 0.3, display: 'inline-block' }} /></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        ) : filteredTransactions.length > 0 ? (
                             <table className={styles.table}>
                                 <thead>
                                     <tr>
