@@ -7,22 +7,22 @@ import {
 import styles from './Analytics.module.css';
 import { useVault } from '@/context/VaultContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { getCurrencySymbol, formatDate } from '@/types';
+import { ShoppingBag, X } from 'lucide-react';
+import { QuickAddFAB } from '@/components/QuickAddFAB';
 
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6'];
 
 export const AnalyticsContent = () => {
-    const { transactions = [], currency = 'SGD', isLoading } = useVault();
+    const { transactions = [], currency = 'SGD', availableCurrencies = [], isLoading } = useVault();
     const [isMounted, setIsMounted] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    // Helper to get currency symbol
-    const getSymbol = (code: string) => {
-        return code === 'USD' ? '$' : code === 'EUR' ? '€' : code === 'SGD' ? 'S$' : '$';
-    };
-    const currencySymbol = getSymbol(currency || 'SGD');
+    const currencySymbol = getCurrencySymbol(currency || 'SGD', availableCurrencies);
 
     // 1. Spending by Category
     const categoryData = useMemo(() => {
@@ -123,9 +123,20 @@ export const AnalyticsContent = () => {
                                             paddingAngle={4}
                                             dataKey="value"
                                             stroke="none"
+                                            onClick={(data) => {
+                                                if (data && data.name) {
+                                                    setSelectedCategory(selectedCategory === data.name ? null : data.name);
+                                                }
+                                            }}
+                                            style={{ cursor: 'pointer' }}
                                         >
                                             {categoryData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={COLORS[index % COLORS.length]}
+                                                    stroke={selectedCategory === entry.name ? '#fff' : 'none'}
+                                                    strokeWidth={2}
+                                                />
                                             ))}
                                         </Pie>
                                         <ReTooltip
@@ -158,8 +169,14 @@ export const AnalyticsContent = () => {
                             <div className={styles.breakdownTable}>
                                 {[...categoryData].sort((a, b) => b.value - a.value).map((cat, index) => {
                                     const percent = totalSpending > 0 ? ((cat.value / totalSpending) * 100).toFixed(1) : "0.0";
+                                    const isSelected = selectedCategory === cat.name;
                                     return (
-                                        <div key={cat.name} className={styles.row}>
+                                        <div
+                                            key={cat.name}
+                                            className={`${styles.row} ${isSelected ? styles.rowSelected : ''}`}
+                                            onClick={() => setSelectedCategory(isSelected ? null : cat.name)}
+                                            style={{ cursor: 'pointer', border: isSelected ? '1px solid var(--primary)' : '1px solid transparent' }}
+                                        >
                                             <div className={styles.catInfo}>
                                                 <div className={styles.dot} style={{ background: COLORS[index % COLORS.length], boxShadow: `0 0 10px ${COLORS[index % COLORS.length]}44` }} />
                                                 <span className={styles.catName}>{cat.name}</span>
@@ -228,6 +245,47 @@ export const AnalyticsContent = () => {
                     )}
                 </div>
             </div>
+            {/* Drill-down Transactions */}
+            {selectedCategory && (
+                <div className={styles.drillDownSection} style={{ gridColumn: '1 / -1' }}>
+                    <div className={styles.card}>
+                        <div className={styles.cardHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <h2 className={styles.cardTitle}>Transactions: {selectedCategory}</h2>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 4 }}>
+                                    All expenses in this category
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setSelectedCategory(null)}
+                                style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className={styles.drillDownList} style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
+                            {transactions
+                                .filter(t => t.type === 'expense' && t.category === selectedCategory)
+                                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                                .map(t => (
+                                    <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px' }}>
+                                        <div style={{ width: 40, height: 40, borderRadius: '12px', background: 'var(--input-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <ShoppingBag size={18} />
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontWeight: 600 }}>{t.merchant}</div>
+                                            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{formatDate(t.date)}</div>
+                                        </div>
+                                        <div style={{ fontWeight: 700, fontSize: 16 }}>
+                                            -{currencySymbol}{t.amount.toFixed(2)}
+                                        </div>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+            <QuickAddFAB />
         </div>
     );
 };

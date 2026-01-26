@@ -73,6 +73,16 @@
     padding: 12px;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 12px;
+    transition: all 0.2s;
+}
+
+.rowSelected {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--primary) !important;
+}
+
+.row:hover {
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .catInfo {
@@ -257,6 +267,42 @@
 
 .submitBtn:hover {
     background: #2563eb;
+}
+
+.drillDownSection {
+    margin-top: 24px;
+    animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.drillDownList {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.drillDownList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.drillDownList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.drillDownList::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
 }
 
 @media (max-width: 1024px) {

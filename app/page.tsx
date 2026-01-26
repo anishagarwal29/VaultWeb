@@ -1,29 +1,27 @@
 "use client";
 import React from "react";
 import { Sidebar } from "@/components/Sidebar";
-import { BalanceCard } from "@/components/BalanceCard";
-import { SpendingChart } from "@/components/SpendingChart";
-import { Bell, Search, ShoppingBag, Coffee, Car, Music } from "lucide-react";
+import { Bell, Search, ShoppingBag } from "lucide-react";
 import styles from "./HomePage.module.css";
 import { useVault } from "@/context/VaultContext";
 import { getCurrencySymbol, formatDate } from "@/types";
 import { useExchangeRates } from "@/hooks/useExchangeRates";
+import { SpendingChart } from "@/components/SpendingChart";
+import { QuickAddFAB } from "@/components/QuickAddFAB";
 
 const Home = () => {
-  const { transactions, accounts, currency, user, login, isLoading } = useVault();
+  const { transactions, accounts, getUpcomingSubscriptions, currency, availableCurrencies, user, login, isLoading } = useVault();
   const [currentDate, setCurrentDate] = React.useState('');
-  const currencySymbol = getCurrencySymbol(currency);
+  const currencySymbol = getCurrencySymbol(currency, availableCurrencies);
+  const upcomingSubscriptions = getUpcomingSubscriptions().slice(0, 3);
 
   // Exchange Rates
-  const { rates, isLoading: ratesLoading } = useExchangeRates(currency);
+  const { rates } = useExchangeRates(currency);
 
   const getNormalizedAmount = (amount: number, accountId?: string) => {
-    // If we are loading rates, just return amount (or 0?) to avoid flash of wrong numbers?
-    // Better to return amount as fallback.
     if (!accountId) return amount;
     const account = accounts.find(a => a.id === accountId);
     if (!account) return amount;
-
     if (account.currency === currency) return amount;
     const rate = rates[account.currency];
     return rate ? amount / rate : amount;
@@ -57,7 +55,6 @@ const Home = () => {
       <Sidebar />
       <main className={styles.main}>
         {isLoading ? (
-          // Loading Skeleton
           <div style={{ opacity: 0.5, pointerEvents: 'none' }}>
             <header className={styles.header}>
               <div style={{ height: 48, width: 200, background: 'var(--border)', borderRadius: 8 }}></div>
@@ -104,7 +101,7 @@ const Home = () => {
             <div className={styles.grid}>
               <div className={styles.leftCol}>
                 <div style={{ background: 'var(--surface)', padding: 32, borderRadius: 24, border: '1px solid var(--border)', marginBottom: 24 }}>
-                  <div style={{ opacity: 0.7, fontSize: 14, marginBottom: 8 }}>TOTAL BALANCE</div>
+                  <div style={{ opacity: 0.7, fontSize: 13, marginBottom: 8 }}>TOTAL BALANCE</div>
                   <div style={{ fontSize: 48, fontWeight: 700, marginBottom: 24 }}>{currencySymbol}{totalBalance.toLocaleString()}</div>
                   <div style={{ display: 'flex', gap: 32 }}>
                     <div>
@@ -127,10 +124,45 @@ const Home = () => {
               </div>
 
               <div className={styles.rightCol}>
+                {upcomingSubscriptions.length > 0 && (
+                  <div className={styles.upcomingBills} style={{ marginBottom: 24 }}>
+                    <div className={styles.sectionHeader}>
+                      <h3>Upcoming Bills</h3>
+                      <button className={styles.viewAll} onClick={() => window.location.href = '/subscriptions'}>View All</button>
+                    </div>
+                    <div className={styles.billList}>
+                      {upcomingSubscriptions.map(sub => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const billDate = new Date(sub.nextBillingDate);
+                        billDate.setHours(0, 0, 0, 0);
+                        const diffDays = Math.ceil((billDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+                        return (
+                          <div key={sub.id} className={styles.billItem}>
+                            <div className={styles.billIcon} style={{ background: sub.color || 'var(--primary)' }}>
+                              {sub.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div className={styles.billInfo}>
+                              <div className={styles.billName}>{sub.name}</div>
+                              <div className={styles.billDue} style={{ color: diffDays <= 2 ? '#ef4444' : 'var(--text-secondary)' }}>
+                                {diffDays === 0 ? 'Due Today' : `Due in ${diffDays} days`}
+                              </div>
+                            </div>
+                            <div className={styles.billAmount}>
+                              {currencySymbol}{(sub.cost || 0).toFixed(2)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className={styles.recentTransactions}>
                   <div className={styles.sectionHeader}>
                     <h3>Recent Transactions</h3>
-                    <button className={styles.viewAll}>View All</button>
+                    <button className={styles.viewAll} onClick={() => window.location.href = '/transactions'}>View All</button>
                   </div>
                   <div className={styles.transactionList}>
                     {recentTransactions.length === 0 ? (
@@ -158,8 +190,9 @@ const Home = () => {
           </>
         )}
       </main>
+      <QuickAddFAB />
     </div>
   );
-}
+};
 
 export default Home;

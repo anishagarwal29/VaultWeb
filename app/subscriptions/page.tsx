@@ -11,6 +11,7 @@ export default function SubscriptionsPage() {
         subscriptions,
         addSubscription,
         deleteSubscription,
+        editSubscription,
         calculateMonthlyBurnRate,
         getUpcomingSubscriptions,
         getExpiringTrials,
@@ -19,6 +20,7 @@ export default function SubscriptionsPage() {
         isLoading
     } = useVault();
 
+    const [editingSubscription, setEditingSubscription] = useState<Subscription | null>(null);
     const [form, setForm] = useState({
         name: '',
         cost: '',
@@ -30,27 +32,7 @@ export default function SubscriptionsPage() {
         description: ''
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!form.name || !form.cost) return;
-
-        const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'];
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-
-        const newSub: Subscription = {
-            id: Date.now().toString(),
-            name: form.name,
-            cost: parseFloat(form.cost),
-            frequency: form.frequency,
-            category: form.category,
-            nextBillingDate: form.isTrial ? form.trialEndDate : form.nextBillingDate, // Start billing after trial
-            isTrial: form.isTrial,
-            trialEndDate: form.isTrial ? form.trialEndDate : undefined,
-            color: randomColor,
-            description: form.description
-        };
-
-        addSubscription(newSub);
+    const resetForm = () => {
         setForm({
             name: '',
             cost: '',
@@ -61,6 +43,60 @@ export default function SubscriptionsPage() {
             trialEndDate: new Date().toISOString().split('T')[0],
             description: ''
         });
+        setEditingSubscription(null);
+    };
+
+    const handleEditInitiate = (sub: Subscription) => {
+        setEditingSubscription(sub);
+        setForm({
+            name: sub.name,
+            cost: sub.cost.toString(),
+            frequency: sub.frequency,
+            category: sub.category,
+            nextBillingDate: sub.nextBillingDate,
+            isTrial: sub.isTrial,
+            trialEndDate: sub.trialEndDate || new Date().toISOString().split('T')[0],
+            description: sub.description || ''
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!form.name || !form.cost) return;
+
+        if (editingSubscription) {
+            const updatedSub: Subscription = {
+                ...editingSubscription,
+                name: form.name,
+                cost: parseFloat(form.cost),
+                frequency: form.frequency,
+                category: form.category,
+                nextBillingDate: form.isTrial ? form.trialEndDate : form.nextBillingDate,
+                isTrial: form.isTrial,
+                trialEndDate: form.isTrial ? form.trialEndDate : undefined,
+                description: form.description
+            };
+            editSubscription(updatedSub);
+        } else {
+            const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+            const newSub: Subscription = {
+                id: Date.now().toString(),
+                name: form.name,
+                cost: parseFloat(form.cost),
+                frequency: form.frequency,
+                category: form.category,
+                nextBillingDate: form.isTrial ? form.trialEndDate : form.nextBillingDate,
+                isTrial: form.isTrial,
+                trialEndDate: form.isTrial ? form.trialEndDate : undefined,
+                color: randomColor,
+                description: form.description
+            };
+            addSubscription(newSub);
+        }
+        resetForm();
     };
 
     const calculateDaysRemaining = (dateStr: string) => {
@@ -106,7 +142,12 @@ export default function SubscriptionsPage() {
                     </section>
 
                     <section className={styles.formCard}>
-                        <h2 className={styles.formTitle}>Add New Subscription</h2>
+                        <div className={styles.formHeader}>
+                            <h2 className={styles.formTitle}>{editingSubscription ? 'Edit Subscription' : 'Add New Subscription'}</h2>
+                            {editingSubscription && (
+                                <button className={styles.cancelBtn} onClick={resetForm}>Cancel</button>
+                            )}
+                        </div>
                         <form onSubmit={handleSubmit} className={styles.form}>
                             <div className={styles.inputGroup}>
                                 <label className={styles.label}>Service Name</label>
@@ -175,7 +216,7 @@ export default function SubscriptionsPage() {
                             </div>
                             <button type="submit" className={styles.submitBtn}>
                                 <Plus size={18} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-                                Add Subscription
+                                {editingSubscription ? 'Update Subscription' : 'Add Subscription'}
                             </button>
                         </form>
                     </section>
@@ -240,13 +281,22 @@ export default function SubscriptionsPage() {
                                                     : (daysRemaining === 0 ? 'Due Today' : daysRemaining < 0 ? `Past due by ${Math.abs(daysRemaining)}d` : `${daysRemaining} days left`)}
                                             </div>
                                         </div>
-                                        <button
-                                            className={styles.deleteBtn}
-                                            onClick={() => deleteSubscription(sub.id)}
-                                            title="Delete Subscription"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
+                                        <div className={styles.actions}>
+                                            <button
+                                                className={styles.editBtn}
+                                                onClick={() => handleEditInitiate(sub)}
+                                                title="Edit Subscription"
+                                            >
+                                                <Zap size={18} />
+                                            </button>
+                                            <button
+                                                className={styles.deleteBtn}
+                                                onClick={() => deleteSubscription(sub.id)}
+                                                title="Delete Subscription"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
                                     </div>
                                 );
                             })

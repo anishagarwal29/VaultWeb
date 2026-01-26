@@ -17,6 +17,7 @@ interface VaultContextType {
     deleteTransaction: (id: string) => void;
     addSubscription: (subscription: Subscription) => void;
     deleteSubscription: (id: string) => void;
+    editSubscription: (subscription: Subscription) => void;
     addAccount: (account: Account) => void;
     deleteAccount: (id: string) => void;
     editAccount: (account: Account) => void;
@@ -329,6 +330,10 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
         setSubscriptions(prev => prev.filter(s => s.id !== id));
     };
 
+    const editSubscription = (updatedSubscription: Subscription) => {
+        setSubscriptions(prev => prev.map(s => s.id === updatedSubscription.id ? updatedSubscription : s));
+    };
+
     const calculateMonthlyBurnRate = () => {
         return subscriptions.reduce((total, sub) => {
             if (sub.isTrial) return total; // Trials are free
@@ -520,6 +525,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
             deleteTransaction,
             addSubscription,
             deleteSubscription,
+            editSubscription,
             addAccount,
             deleteAccount,
             editAccount,
