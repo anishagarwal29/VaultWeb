@@ -121,6 +121,9 @@ export default function SubscriptionsPage() {
                 <header className={styles.header}>
                     <h1 className={styles.title}>Subscription Overview</h1>
                     <p className={styles.subtitle}>Manage your recurring commitments and optimize your burn rate.</p>
+                    <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 8, opacity: 0.8 }}>
+                        (Note: Subscriptions are for tracking only and do not automatically deduct from accounts)
+                    </p>
                 </header>
 
                 {expiringTrials.length > 0 && (

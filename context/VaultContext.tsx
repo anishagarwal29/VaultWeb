@@ -52,6 +52,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     const [currency, setCurrency] = useState<string>('SGD');
     const [theme, setTheme] = useState<'dark' | 'light'>('dark');
     const [availableCurrencies, setAvailableCurrencies] = useState<Currency[]>(DEFAULT_CURRENCIES);
+    const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
     const [isLoaded, setIsLoaded] = useState(false);
 
     // --- FIREBASE INTEGRATION ---
@@ -92,7 +93,12 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
                 setSubscriptions(data.subscriptions || []);
                 setBudgets(data.budgets || []);
                 setCurrency(data.currency || 'SGD');
+                setBudgets(data.budgets || []);
+                setCurrency(data.currency || 'SGD');
                 setTheme(data.theme || 'dark');
+                if (data.categories) {
+                    setCategories(data.categories);
+                }
                 // ... load other settings
             } else {
                 // 3. First Time Login Migration?
@@ -138,6 +144,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
                         budgets: deepSanitize(budgets),
                         currency,
                         theme,
+                        categories: deepSanitize(categories),
                         lastUpdated: new Date().toISOString()
                     }, { merge: true });
                     console.log("Data saved successfully!");
@@ -153,7 +160,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
             const timeout = setTimeout(saveData, 1000);
             return () => clearTimeout(timeout);
         }
-    }, [user, transactions, accounts, subscriptions, budgets, currency, theme, isLoaded]);
+    }, [user, transactions, accounts, subscriptions, budgets, currency, theme, categories, isLoaded]);
 
 
     const migrateLocalToCloud = async (userId: string) => {
@@ -529,8 +536,6 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     const addCurrency = (currency: Currency) => {
         setAvailableCurrencies(prev => [...prev, currency]);
     };
-
-    const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
 
     const addCategory = (category: Category) => {
         setCategories(prev => [...prev, category]);
