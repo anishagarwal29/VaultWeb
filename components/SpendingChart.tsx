@@ -8,6 +8,7 @@ import { getCurrencySymbol } from '@/types';
 
 export function SpendingChart() {
     const { transactions, currency, accounts } = useVault();
+    const [timeRange, setTimeRange] = React.useState('7days');
     const currencySymbol = getCurrencySymbol(currency);
     const { rates } = useExchangeRates(currency);
 
@@ -24,31 +25,59 @@ export function SpendingChart() {
     const data = useMemo(() => {
         const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const today = new Date();
-        const last7Days = Array.from({ length: 7 }, (_, i) => {
-            const d = new Date(today);
-            d.setDate(today.getDate() - (6 - i));
-            return d;
-        });
+        let dateRange: Date[] = [];
 
-        return last7Days.map(date => {
-            const dayName = days[date.getDay()];
+        if (timeRange === '7days') {
+            dateRange = Array.from({ length: 7 }, (_, i) => {
+                const d = new Date(today);
+                d.setDate(today.getDate() - (6 - i));
+                return d;
+            });
+        } else {
+            // This Month
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            const numDays = new Date(year, month + 1, 0).getDate(); // last day of month
+
+            // Generate all days up to today (or end of month? Let's show up to today + rest as 0 or empty? 
+            // Standard generic chart is usually all days in month or just up to today. 
+            // Let's do all days in month to show progress, but future dates will be 0.
+
+            dateRange = Array.from({ length: numDays }, (_, i) => {
+                return new Date(year, month, i + 1);
+            });
+        }
+
+        return dateRange.map(date => {
+            const dayName = days[date.getDay()]; // Or maybe date number for month view?
+            // For month view, just showing 'Sun', 'Mon' etc is repetitive. 
+            // Maybe show DD (e.g. 01, 02) for month view?
+            // Let's stick to simple "Date" or "Day" label.
+
+            // Actually, for XAxis tick, if it's month view, we want '1', '2', ... '31'.
+            const name = timeRange === '7days' ? dayName : String(date.getDate());
+
             const dayStr = date.toISOString().split('T')[0];
 
             const daySpend = transactions
                 .filter(t => t.type === 'expense' && t.date.startsWith(dayStr))
                 .reduce((sum, t) => sum + getNormalizedAmount(t.amount, t.accountId), 0);
 
-            return { name: dayName, uv: daySpend };
+            return { name, uv: daySpend, fullDate: dayStr };
         });
-    }, [transactions, rates, currency, accounts]);
+    }, [transactions, rates, currency, accounts, timeRange]);
 
     return (
         <div className={styles.container}>
             <div className={styles.header}>
                 <h3 className={styles.title}>Spending Activity</h3>
-                <select className={styles.filter}>
-                    <option>Last 7 Days</option>
-                    <option>This Month</option>
+                <select
+                    className={styles.filter}
+                    value={timeRange}
+                    onChange={(e) => setTimeRange(e.target.value)}
+                >
+                    <option value="7days">Last 7 Days</option>
+                    <option value="month">This Month</option>
                 </select>
             </div>
             <div className={styles.chartArea}>

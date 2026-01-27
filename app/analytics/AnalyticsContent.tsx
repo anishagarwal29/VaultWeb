@@ -10,6 +10,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { getCurrencySymbol, formatDate } from '@/types';
 import { ShoppingBag, X } from 'lucide-react';
 import { QuickAddFAB } from '@/components/QuickAddFAB';
+import { SpendingChart } from '@/components/SpendingChart';
 
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6'];
 
@@ -198,10 +199,15 @@ export const AnalyticsContent = () => {
                 </div>
             </div>
 
-            {/* Monthly Trends */}
+            {/* Spending Activity / Trends */}
+            <div style={{ gridColumn: 'span 1' }}>
+                <SpendingChart />
+            </div>
+
+            {/* Historical Monthly Trends */}
             <div className={styles.card}>
                 <div className={styles.cardHeader}>
-                    <h2 className={styles.cardTitle}>Monthly Trends</h2>
+                    <h2 className={styles.cardTitle}>Historical Trends</h2>
                     <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 4 }}>Expenses over time</p>
                 </div>
                 <div className={styles.chartContainer} style={{ minHeight: 300 }}>
@@ -246,47 +252,49 @@ export const AnalyticsContent = () => {
                 </div>
             </div>
             {/* Drill-down Transactions */}
-            {selectedCategory && (
-                <div className={styles.drillDownSection} style={{ gridColumn: '1 / -1' }}>
-                    <div className={styles.card}>
-                        <div className={styles.cardHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                                <h2 className={styles.cardTitle}>Transactions: {selectedCategory}</h2>
-                                <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 4 }}>
-                                    All expenses in this category
-                                </p>
+            {
+                selectedCategory && (
+                    <div className={styles.drillDownSection} style={{ gridColumn: '1 / -1' }}>
+                        <div className={styles.card}>
+                            <div className={styles.cardHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                    <h2 className={styles.cardTitle}>Transactions: {selectedCategory}</h2>
+                                    <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 4 }}>
+                                        All expenses in this category
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setSelectedCategory(null)}
+                                    style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                                >
+                                    <X size={20} />
+                                </button>
                             </div>
-                            <button
-                                onClick={() => setSelectedCategory(null)}
-                                style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <div className={styles.drillDownList} style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
-                            {transactions
-                                .filter(t => t.type === 'expense' && t.category === selectedCategory)
-                                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                                .map(t => (
-                                    <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px' }}>
-                                        <div style={{ width: 40, height: 40, borderRadius: '12px', background: 'var(--input-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <ShoppingBag size={18} />
+                            <div className={styles.drillDownList} style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
+                                {transactions
+                                    .filter(t => t.type === 'expense' && t.category === selectedCategory)
+                                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                                    .map(t => (
+                                        <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px' }}>
+                                            <div style={{ width: 40, height: 40, borderRadius: '12px', background: 'var(--input-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <ShoppingBag size={18} />
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ fontWeight: 600 }}>{t.merchant}</div>
+                                                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{formatDate(t.date)}</div>
+                                            </div>
+                                            <div style={{ fontWeight: 700, fontSize: 16 }}>
+                                                -{currencySymbol}{t.amount.toFixed(2)}
+                                            </div>
                                         </div>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontWeight: 600 }}>{t.merchant}</div>
-                                            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{formatDate(t.date)}</div>
-                                        </div>
-                                        <div style={{ fontWeight: 700, fontSize: 16 }}>
-                                            -{currencySymbol}{t.amount.toFixed(2)}
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
             <QuickAddFAB />
-        </div>
+        </div >
     );
 };
 
