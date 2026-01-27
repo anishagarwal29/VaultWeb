@@ -15,11 +15,13 @@ export default function TransactionsPage() {
 
     const getSymbol = (code: string) => availableCurrencies.find(c => c.code === code)?.symbol || '$';
 
-    const filteredTransactions = transactions.filter(t =>
-        t.merchant.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (t.note && t.note.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    const filteredTransactions = transactions
+        .filter(t =>
+            t.merchant.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            t.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (t.note && t.note.toLowerCase().includes(searchTerm.toLowerCase()))
+        )
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     const handleEdit = (transaction: Transaction) => {
         setEditingTransaction(transaction);
@@ -295,6 +297,15 @@ function TransactionModal({
             alert("Please enter a valid amount");
             return;
         }
+
+        console.log("Saving Transaction - Debug Info:", {
+            enteredOriginal: originalAmount,
+            converted: convertedAmount,
+            isForeign,
+            finalAmount,
+            type,
+            currency: txnCurrency
+        });
 
         const newTransaction: Transaction = {
             id: transaction?.id || Date.now().toString(),

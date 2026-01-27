@@ -109,6 +109,15 @@ function QuickTransactionForm({
         }
 
         const finalAmount = isForeign ? parseFloat(convertedAmount) : parseFloat(originalAmount);
+
+        console.log("QuickAddFAB - Saving Transaction Debug:", {
+            enteredOriginal: originalAmount,
+            converted: convertedAmount,
+            isForeign,
+            finalAmount,
+            type,
+            currency: txnCurrency
+        });
         const newTransaction: Transaction = {
             id: Date.now().toString(),
             merchant,
