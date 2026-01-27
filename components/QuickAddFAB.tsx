@@ -200,6 +200,11 @@ function QuickTransactionForm({
                 <input required type="number" step="any" className={styles.input} value={originalAmount} onChange={e => setOriginalAmount(e.target.value)} placeholder="0.00" />
             </div>
 
+            <div className={styles.inputGroup}>
+                <label className={styles.label}>Date</label>
+                <input type="date" lang="en-GB" className={styles.input} value={date} onChange={e => setDate(e.target.value)} />
+            </div>
+
             {type !== 'transfer' && (
                 <div className={styles.inputGroup}>
                     <label className={styles.label}>Category</label>

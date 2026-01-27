@@ -429,7 +429,7 @@ function TransactionModal({
 
                     <div className={styles.formGroup}>
                         <label className={styles.label}>Date</label>
-                        <input type="date" className={styles.input} value={date} onChange={e => setDate(e.target.value)} />
+                        <input type="date" lang="en-GB" className={styles.input} value={date} onChange={e => setDate(e.target.value)} />
                     </div>
 
                     <button type="submit" className={styles.submitBtn}>
