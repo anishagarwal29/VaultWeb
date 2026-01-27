@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import DatePicker from "react-datepicker";
 import { Sidebar } from '@/components/Sidebar';
 import { useVault } from '@/context/VaultContext';
 import styles from './Transactions.module.css';
@@ -429,7 +430,39 @@ function TransactionModal({
 
                     <div className={styles.formGroup}>
                         <label className={styles.label}>Date</label>
-                        <input type="date" lang="en-GB" className={styles.input} value={date} onChange={e => setDate(e.target.value)} />
+                        <DatePicker
+                            selected={date ? new Date(date) : new Date()}
+                            onChange={(date: Date | null) => {
+                                if (date) {
+                                    // Keep it as YYYY-MM-DD for consistency with existing logic? 
+                                    // Actually the existing logic used split('T')[0] so likely YYYY-MM-DD.
+                                    // But let's check if the backend expects full ISO. 
+                                    // The type definition says 'date: string; // ISO String'.
+                                    // But the init was split('T')[0].
+                                    // Let's safe convert to ISO string but maybe keep time 00:00:00?
+                                    // The native input type=date returns YYYY-MM-DD.
+                                    // So passing YYYY-MM-DD is safe.
+                                    // But DatePicker gives localized Date. 
+                                    // Let's use setDate(date.toISOString()) but that might include time offset issues.
+                                    // Safer: setDate(date.toISOString().split('T')[0]) or manually format.
+                                    // Let's use a helper or simple ISO split.
+
+                                    // Actually, let's use the same format as native input: YYYY-MM-DD
+                                    // The Date object from datepicker is local time (usually 00:00).
+                                    // toISOString() converts to UTC.
+                                    // If I pick Jan 27 00:00 local, and I am GMT+8, ISO is Jan 26 16:00.
+                                    // That changes the date! 
+                                    // I must correct for timezone offset before ISO string, or just format YYYY-MM-DD manually.
+
+                                    const offset = date.getTimezoneOffset();
+                                    const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+                                    setDate(localDate.toISOString().split('T')[0]);
+                                }
+                            }}
+                            dateFormat="dd/MM/yyyy"
+                            className={styles.input}
+                            wrapperClassName={styles.datePickerWrapper}
+                        />
                     </div>
 
                     <button type="submit" className={styles.submitBtn}>

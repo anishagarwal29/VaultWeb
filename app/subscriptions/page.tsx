@@ -5,6 +5,7 @@ import styles from './Subscriptions.module.css';
 import { useVault } from '@/context/VaultContext';
 import { Subscription, Frequency, getCurrencySymbol } from '@/types';
 import { Plus, Trash2, Calendar, Zap, LayoutGrid, Clock, AlertTriangle } from 'lucide-react';
+import DatePicker from "react-datepicker";
 
 export default function SubscriptionsPage() {
     const {
@@ -200,11 +201,19 @@ export default function SubscriptionsPage() {
                                 <label className={styles.label}>
                                     {form.isTrial ? 'Trial End Date' : 'Next Billing Date'}
                                 </label>
-                                <input
-                                    type="date"
+                                <DatePicker
+                                    selected={(form.isTrial ? form.trialEndDate : form.nextBillingDate) ? new Date(form.isTrial ? form.trialEndDate! : form.nextBillingDate) : new Date()}
+                                    onChange={(date: Date | null) => {
+                                        if (date) {
+                                            const offset = date.getTimezoneOffset();
+                                            const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+                                            const dateStr = localDate.toISOString().split('T')[0];
+                                            setForm({ ...form, [form.isTrial ? 'trialEndDate' : 'nextBillingDate']: dateStr });
+                                        }
+                                    }}
+                                    dateFormat="dd/MM/yyyy"
                                     className={styles.input}
-                                    value={form.isTrial ? form.trialEndDate : form.nextBillingDate}
-                                    onChange={e => setForm({ ...form, [form.isTrial ? 'trialEndDate' : 'nextBillingDate']: e.target.value })}
+                                    wrapperClassName={styles.datePickerWrapper}
                                 />
                             </div>
 

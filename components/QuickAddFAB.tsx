@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import DatePicker from "react-datepicker";
 import { Plus, X } from 'lucide-react';
 import { useVault } from '@/context/VaultContext';
 import styles from './QuickAddFAB.module.css';
@@ -202,7 +203,19 @@ function QuickTransactionForm({
 
             <div className={styles.inputGroup}>
                 <label className={styles.label}>Date</label>
-                <input type="date" lang="en-GB" className={styles.input} value={date} onChange={e => setDate(e.target.value)} />
+                <DatePicker
+                    selected={date ? new Date(date) : new Date()}
+                    onChange={(date: Date | null) => {
+                        if (date) {
+                            const offset = date.getTimezoneOffset();
+                            const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+                            setDate(localDate.toISOString().split('T')[0]);
+                        }
+                    }}
+                    dateFormat="dd/MM/yyyy"
+                    className={styles.input}
+                    wrapperClassName={styles.datePickerWrapper}
+                />
             </div>
 
             {type !== 'transfer' && (
