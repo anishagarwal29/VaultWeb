@@ -11,17 +11,24 @@ export default function TransactionsPage() {
     const { transactions, addTransaction, deleteTransaction, editTransaction, transferFunds, accounts, currency, availableCurrencies, categories, isLoading } = useVault();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
     const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
 
     const getSymbol = (code: string) => availableCurrencies.find(c => c.code === code)?.symbol || '$';
 
     const filteredTransactions = transactions
-        .filter(t =>
-            t.merchant.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            t.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (t.note && t.note.toLowerCase().includes(searchTerm.toLowerCase()))
-        )
+        .filter(t => {
+            // Search filter
+            const matchesSearch = t.merchant.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                t.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (t.note && t.note.toLowerCase().includes(searchTerm.toLowerCase()));
+
+            // Category filter
+            const matchesCategory = selectedCategory === 'all' || t.category === selectedCategory;
+
+            return matchesSearch && matchesCategory;
+        })
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     const handleEdit = (transaction: Transaction) => {
@@ -50,6 +57,16 @@ export default function TransactionsPage() {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
+                        <select
+                            className={styles.categoryFilter}
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                        >
+                            <option value="all">All Categories</option>
+                            {categories.map(cat => (
+                                <option key={cat.id} value={cat.name}>{cat.name}</option>
+                            ))}
+                        </select>
                         <button className={styles.addBtn} onClick={() => { setEditingTransaction(null); setIsModalOpen(true); }}>
                             <Plus size={20} />
                             Add New

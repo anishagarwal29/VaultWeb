@@ -286,11 +286,23 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
 
     const deleteTransaction = (id: string) => {
         const primaryTx = transactions.find(t => t.id === id);
-        if (!primaryTx) return;
+        if (!primaryTx) {
+            console.warn(`Transaction ${id} not found`);
+            return;
+        }
 
+        // Find all transactions to delete (handles linked transfers)
         const transactionsToDelete = primaryTx.linkedId
             ? transactions.filter(t => t.linkedId === primaryTx.linkedId)
             : [primaryTx];
+
+        console.log('Deleting transactions:', transactionsToDelete.map(t => ({
+            id: t.id,
+            type: t.type,
+            amount: t.amount,
+            accountId: t.accountId,
+            merchant: t.merchant
+        })));
 
         // 1. Remove from state
         setTransactions(prev => prev.filter(t =>
@@ -300,15 +312,23 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
         // 2. Revert balances for ALL involved transactions (handles BOTH sides of a transfer)
         setAccounts(prev => prev.map(acc => {
             let updatedBalance = acc.balance;
+            let hasChanges = false;
+
             transactionsToDelete.forEach(tx => {
                 if (tx.accountId === acc.id) {
+                    hasChanges = true;
+                    const oldBalance = updatedBalance;
+
                     // Reversing: if it was income, subtract it; if expense, add it back.
                     updatedBalance = tx.type === 'income'
                         ? updatedBalance - tx.amount
                         : updatedBalance + tx.amount;
+
+                    console.log(`Account ${acc.name}: ${oldBalance} → ${updatedBalance} (reverted ${tx.type} of ${tx.amount})`);
                 }
             });
-            return { ...acc, balance: updatedBalance };
+
+            return hasChanges ? { ...acc, balance: updatedBalance } : acc;
         }));
     };
 
