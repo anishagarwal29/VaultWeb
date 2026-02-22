@@ -30,7 +30,7 @@ export default function BudgetsPage() {
 
     // Budgets Logic
     const budgetProgress = useMemo(() => {
-        const expenses = transactions.filter(t => t.type === 'expense');
+        const expenses = transactions.filter(t => t.type === 'expense' && !t.linkedId);
         const currentMonth = new Date().getMonth();
 
         return budgets.map(b => {
