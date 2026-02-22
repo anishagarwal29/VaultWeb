@@ -59,8 +59,9 @@ export function SpendingChart() {
 
             const dayStr = date.toISOString().split('T')[0];
 
+            // Exclude transfers (linkedId set) — inter-account transfers are not real spending
             const daySpend = transactions
-                .filter(t => t.type === 'expense' && t.date.startsWith(dayStr))
+                .filter(t => t.type === 'expense' && !t.linkedId && t.date.startsWith(dayStr))
                 .reduce((sum, t) => sum + getNormalizedAmount(t.amount, t.accountId), 0);
 
             return { name, uv: daySpend, fullDate: dayStr };

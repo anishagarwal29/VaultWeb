@@ -29,7 +29,8 @@ export const AnalyticsContent = () => {
     const categoryData = useMemo(() => {
         try {
             if (!Array.isArray(transactions)) return [];
-            const expenses = transactions.filter(t => t && t.type === 'expense');
+            // Exclude transfers (linkedId is set) — inter-account transfers are not real spending
+            const expenses = transactions.filter(t => t && t.type === 'expense' && !t.linkedId);
             const categories: Record<string, number> = {};
 
             expenses.forEach(t => {
@@ -54,7 +55,8 @@ export const AnalyticsContent = () => {
     const monthlyData = useMemo(() => {
         try {
             if (!Array.isArray(transactions)) return [];
-            const expenses = transactions.filter(t => t && t.type === 'expense');
+            // Exclude transfers (linkedId is set) — inter-account transfers are not real spending
+            const expenses = transactions.filter(t => t && t.type === 'expense' && !t.linkedId);
             const monthsMap: Map<string, { total: number, timestamp: number }> = new Map();
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -272,7 +274,8 @@ export const AnalyticsContent = () => {
                             </div>
                             <div className={styles.drillDownList} style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
                                 {transactions
-                                    .filter(t => t.type === 'expense' && t.category === selectedCategory)
+                                    // Exclude transfers from drill-down; they are not real expenses
+                                    .filter(t => t.type === 'expense' && !t.linkedId && t.category === selectedCategory)
                                     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                                     .map(t => (
                                         <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px' }}>

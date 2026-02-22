@@ -121,6 +121,27 @@
     border-bottom: none;
 }
 
+/* Highlight the whole row on hover */
+.table tbody tr {
+    transition: background 0.15s ease;
+    cursor: default;
+}
+
+.table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Underline the merchant name when the row is hovered */
+.merchantName {
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
+}
+
+.table tbody tr:hover .merchantName {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 .amount {
     font-weight: 600;
     font-feature-settings: "tnum";

@@ -135,7 +135,7 @@ export default function TransactionsPage() {
                                                 <td>{formatDate(t.date)}</td>
                                                 <td>
                                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                        <span style={{ fontWeight: 500 }}>{displayName}</span>
+                                                        <span className={styles.merchantName}>{displayName}</span>
                                                         {t.note && <span style={{ fontSize: 12, color: '#666', marginTop: 2 }}>{t.note}</span>}
                                                     </div>
                                                 </td>
