@@ -41,11 +41,11 @@ const Home = () => {
   const totalBalance = accounts.reduce((sum, acc) => sum + getNormalizedAccountBalance(acc), 0);
 
   const income = transactions
-    .filter((t: { type: string, linkedId?: string }) => t.type === 'income' && !t.linkedId)
+    .filter((t: { type: string, linkedId?: string, category: string }) => t.type === 'income' && !t.linkedId && t.category !== 'Transfer')
     .reduce((sum: number, t: any) => sum + getNormalizedAmount(t.amount, t.accountId), 0);
 
   const expense = transactions
-    .filter((t: { type: string, linkedId?: string }) => t.type === 'expense' && !t.linkedId)
+    .filter((t: { type: string, linkedId?: string, category: string }) => t.type === 'expense' && !t.linkedId && t.category !== 'Transfer')
     .reduce((sum: number, t: any) => sum + getNormalizedAmount(t.amount, t.accountId), 0);
 
   const recentTransactions = transactions.slice(0, 5);

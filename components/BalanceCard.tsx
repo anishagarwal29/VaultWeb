@@ -20,11 +20,11 @@ export function BalanceCard() {
     });
 
     const income = currentMonthTransactions
-        .filter(t => t.type === 'income' && !t.linkedId)
+        .filter(t => t.type === 'income' && !t.linkedId && t.category !== 'Transfer')
         .reduce((sum, t) => sum + t.amount, 0);
 
     const expense = currentMonthTransactions
-        .filter(t => t.type === 'expense' && !t.linkedId)
+        .filter(t => t.type === 'expense' && !t.linkedId && t.category !== 'Transfer')
         .reduce((sum, t) => sum + t.amount, 0);
 
     const formatCurrency = (amount: number) => {
